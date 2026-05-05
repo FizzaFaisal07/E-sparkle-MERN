@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Sparkle | Necklaces, Rings & Earrings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* Header */
+ header {
+        background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
+        text-align: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #d4af37;
+        position: relative;
+    }
+
+    .logo img {
+        max-width: 300px;
+        width: 80%;
+        filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));
+    }
+
+    /* Navigation */
+    .navbar {
+        background: #0f0f0f;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #e0e0e0;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    nav ul li a:hover { color: #d4af37; }
+
+    /* Cart Badge */
+    .cart-badge {
+        background: #e67e22;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 10px;
+        position: absolute;
+        top: -8px;
+        right: -12px;
+    }
+
+    /* Dropdown */
+    .dropdown { position: relative; }
+    .dropdown-menu {
+        position: absolute;
+        top: 150%;
+        left: 0;
+        background: #1a1a1a;
+        min-width: 140px;
+        border-radius: 12px;
+        padding: 0.5rem 0;
+        display: none;
+        border: 1px solid #d4af37;
+    }
+    .dropdown.open .dropdown-menu { display: block; }
+    .dropdown-menu li { display: block; margin: 0; }
+    .dropdown-menu li a {
+        display: block;
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+    .dropdown-menu li a:hover { background: #2a2a2a; }
+    .dropdown-toggle::after {
+        content: "▼";
+        font-size: 0.6rem;
+        margin-left: 5px;
+        display: inline-block;
+    }
+
+    /* Search */
+    .search-li { margin-left: auto; }
+    .search-box { display: flex; gap: 5px; align-items: center; }
+    .search-box input {
+        padding: 5px 10px;
+        border: 2px solid #333;
+        border-radius: 30px;
+        background: #1a1a1a;
+        color: #fff;
+        outline: none;
+        width: 120px;
+        font-size: 0.75rem;
+    }
+    .search-box input:focus { border-color: #d4af37; }
+    .search-box button {
+        background: #d4af37;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .search-box button i { font-size: 0.7rem; color: #0a0a0a; }
+
+    .navbar h2 {
+        text-align: center;
+        margin-top: 0.5rem;
+        color: #d4af37;
+        font-size: 0.8rem;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        display: flex;
+        justify-content: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        padding: 0.8rem;
+        background: #0f0f0f;
+        margin: 0 1rem 1rem;
+        border-radius: 50px;
+    }
+    .filter-bar button {
+        background: #2a2a2a;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 20px;
+        color: #e0e0e0;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 0.7rem;
+    }
+    .filter-bar button:hover {
+        background: #d4af37;
+        color: #0a0a0a;
+    }
+
+    /* Search Message */
+    .search-message {
+        text-align: center;
+        padding: 0.8rem;
+        background: #1a1a1a;
+        margin: 0.5rem 2rem;
+        border-radius: 10px;
+        display: none;
+    }
+    .clear-search {
+        background: #d4af37;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-left: 12px;
+        cursor: pointer;
+        font-size: 0.7rem;
+    }
+
+    /* Product Sections */
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 2rem;
+        color: #d4af37;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        position: relative;
+    }
+    h1::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: #d4af37;
+        margin: 8px auto;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .item {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 15px;
+        background: #141414;
+        border: 1px solid #2a2a2a;
+        transition: 0.3s;
+        position: relative;
+    }
+    .item:hover {
+        transform: translateY(-5px);
+        border-color: #d4af37;
+        box-shadow: 0 10px 25px rgba(212,175,55,0.2);
+    }
+    .item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    .name {
+        font-size: 0.9rem;
+        margin: 0.8rem 0 0.3rem;
+        color: #d4af37;
+    }
+    .price {
+        font-size: 0.9rem;
+        color: #f0c45a;
+        margin-bottom: 0.8rem;
+        font-weight: bold;
+    }
+    .cart-button {
+        background: #d4af37;
+        color: #0a0a0a;
+        border: none;
+        padding: 6px 15px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+        font-size: 0.75rem;
+    }
+    .cart-button:hover {
+        background: #f0c45a;
+        transform: scale(1.05);
+    }
+
+    /* Wishlist Button */
+    .wishlist-btn {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(0,0,0,0.5);
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        color: #fff;
+        z-index: 2;
+        font-size: 0.8rem;
+    }
+    .wishlist-btn:hover { color: #e74c3c; }
+
+    /* Footer */
+    footer {
+        background: #050505;
+        padding: 2rem 2rem 1rem;
+        border-top: 1px solid #d4af37;
+        margin-top: 3rem;
+    }
+    .footer-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+    .footer-section h3 {
+        color: #d4af37;
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+    }
+    .footer-section p, .footer-section a {
+        color: #bbb;
+        text-decoration: none;
+        line-height: 1.6;
+        font-size: 0.85rem;
+    }
+    .footer-section a:hover { color: #d4af37; }
+    .social-icons { display: flex; gap: 1rem; margin-top: 0.5rem; }
+    .social-icons a i { font-size: 1.3rem; color: #bbb; transition: 0.3s; }
+    .social-icons a i:hover { color: #d4af37; transform: translateY(-2px); }
+    .footer-bottom { text-align: center; padding-top: 1.5rem; margin-top: 1.5rem; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.75rem; }
+
+    /* Notification */
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        font-size: 0.85rem;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Scroll Top Button */
+    #scrollTopBtn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #d4af37;
+        color: #0a0a0a;
+        border: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        z-index: 999;
+        font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) { .row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+        nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+        .search-li { margin-left: 0; width: 100%; margin-top: 5px; }
+        .search-box { justify-content: center; }
+        .search-box input { width: 180px; }
+        .filter-bar { border-radius: 20px; gap: 0.5rem; }
+        .filter-bar button { padding: 4px 10px; font-size: 0.65rem; }
+        h1 { font-size: 1.5rem; }
+    }
+    @media (max-width: 500px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/300x100?text=E-SPARKLE'">
+    </div>
+</header>
+
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b>Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+<li style="position: relative;">
+    <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+</li>
+            <li class="search-li">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search...">
+                    <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                </div>
+            </li>
+        </ul>
+        <h2><i>Enhance your Elegance with the ultimate Sparkle ✨</i> 💎</h2>
+    </nav>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <button onclick="filterByPrice(0, 50)">Under $50</button>
+    <button onclick="filterByPrice(50, 100)">$50 - $100</button>
+    <button onclick="filterByPrice(100, 200)">$100 - $200</button>
+    <button onclick="filterByPrice(200, 1000)">$200+</button>
+    <button onclick="sortProducts('asc')">Price: Low to High</button>
+    <button onclick="sortProducts('desc')">Price: High to Low</button>
+    <button onclick="clearFilters()">Clear Filters</button>
+</div>
+
+<!-- Search Message -->
+<div id="searchMessage" class="search-message"></div>
+
+<main>
+    <div class="container">
+        <!-- Necklaces Section -->
+        <section id="necklaces">
+            <h1>Necklaces </h1>
+            <div class="row" id="necklacesRow">
+                <div class="item" data-name="Flower Necklace" data-price="180">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Flower Necklace', 180, 'img/n1.jpg')">❤️</button>
+                    <img src="img/n1.jpg" alt="Flower Necklace">
+                    <p class="name"><b>Flower Necklace</b></p>
+                    <p class="price"><b>$180.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Flower Necklace', 180, 'img/n1.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Gold Set" data-price="190">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Set', 190, 'img/n2.jpg')">❤️</button>
+                    <img src="img/n2.jpg" alt="Gold Set">
+                    <p class="name"><b>Gold Set</b></p>
+                    <p class="price"><b>$190.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Gold Set', 190, 'img/n2.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Heart Pendant" data-price="95">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Heart Pendant', 95, 'img/n3.jpg')">❤️</button>
+                    <img src="img/n3.jpg" alt="Heart Pendant">
+                    <p class="name"><b>Heart Pendant</b></p>
+                    <p class="price"><b>$95.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Heart Pendant', 95, 'img/n3.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Diamond Necklace" data-price="210">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Necklace', 210, 'img/n4.jpg')">❤️</button>
+                    <img src="img/n4.jpg" alt="Diamond Necklace">
+                    <p class="name"><b>Diamond Necklace</b></p>
+                    <p class="price"><b>$210.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Diamond Necklace', 210, 'img/n4.jpg')">Add to Cart</button>
+                </div>
+            </div>
+            <div class="row" id="necklacesRow2">
+                <div class="item" data-name="Gold Necklace" data-price="100">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Necklace', 100, 'img/n5.jpg')">❤️</button>
+                    <img src="img/n5.jpg" alt="Gold Necklace">
+                    <p class="name"><b>Gold Necklace</b></p>
+                    <p class="price"><b>$100.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Gold Necklace', 100, 'img/n5.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Red Silver Set" data-price="195">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Red Silver Set', 195, 'img/n6.webp')">❤️</button>
+                    <img src="img/n6.webp" alt="Red Silver Set">
+                    <p class="name"><b>Red Silver Set</b></p>
+                    <p class="price"><b>$195.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Red Silver Set', 195, 'img/n6.webp')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Gold Pendant" data-price="85">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Pendant', 85, 'img/n7.webp')">❤️</button>
+                    <img src="img/n7.webp" alt="Gold Pendant">
+                    <p class="name"><b>Gold Pendant</b></p>
+                    <p class="price"><b>$85.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Gold Pendant', 85, 'img/n7.webp')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Silver Necklace" data-price="250">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Necklace', 250, 'img/n8.webp')">❤️</button>
+                    <img src="img/n8.webp" alt="Silver Necklace">
+                    <p class="name"><b>Silver Necklace</b></p>
+                    <p class="price"><b>$250.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Silver Necklace', 250, 'img/n8.webp')">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rings Section -->
+        <section id="rings">
+            <h1>Rings </h1>
+            <div class="row" id="ringsRow">
+                <div class="item" data-name="Diamond Ring" data-price="200">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Ring', 200, 'img/r1.jpg')">❤️</button>
+                    <img src="img/r1.jpg" alt="Diamond Ring">
+                    <p class="name"><b>Diamond Ring</b></p>
+                    <p class="price"><b>$200.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Diamond Ring', 200, 'img/r1.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Simple Ring" data-price="90">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Simple Ring', 90, 'img/r2.webp')">❤️</button>
+                    <img src="img/r2.webp" alt="Simple Ring">
+                    <p class="name"><b>Simple Ring</b></p>
+                    <p class="price"><b>$90.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Simple Ring', 90, 'img/r2.webp')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Gold Ring" data-price="110">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Ring', 110, 'img/r3.avif')">❤️</button>
+                    <img src="img/r3.avif" alt="Gold Ring">
+                    <p class="name"><b>Gold Ring</b></p>
+                    <p class="price"><b>$110.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Gold Ring', 110, 'img/r3.avif')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Diamond Ring 2" data-price="145">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Ring 2', 145, 'img/r4.jpg')">❤️</button>
+                    <img src="img/r4.jpg" alt="Diamond Ring">
+                    <p class="name"><b>Diamond Ring</b></p>
+                    <p class="price"><b>$145.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Diamond Ring 2', 145, 'img/r4.jpg')">Add to Cart</button>
+                </div>
+            </div>
+            <div class="row" id="ringsRow2">
+                <div class="item" data-name="Golden Ring" data-price="80">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Ring', 80, 'img/r5.jpg')">❤️</button>
+                    <img src="img/r5.jpg" alt="Golden Ring">
+                    <p class="name"><b>Golden Ring</b></p>
+                    <p class="price"><b>$80.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Golden Ring', 80, 'img/r5.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Silver Ring" data-price="120">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Ring', 120, 'img/r6.webp')">❤️</button>
+                    <img src="img/r6.webp" alt="Silver Ring">
+                    <p class="name"><b>Silver Ring</b></p>
+                    <p class="price"><b>$120.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Silver Ring', 120, 'img/r6.webp')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Flower Ring" data-price="110">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Flower Ring', 110, 'img/r7.jpg')">❤️</button>
+                    <img src="img/r7.jpg" alt="Flower Ring">
+                    <p class="name"><b>Flower Ring</b></p>
+                    <p class="price"><b>$110.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Flower Ring', 110, 'img/r7.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Golden Ring 2" data-price="96">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Ring 2', 96, 'img/r8.webp')">❤️</button>
+                    <img src="img/r8.webp" alt="Golden Ring">
+                    <p class="name"><b>Golden Ring</b></p>
+                    <p class="price"><b>$96.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Golden Ring 2', 96, 'img/r8.webp')">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Earrings Section -->
+        <section id="earrings">
+            <h1>💎 Earrings 💎</h1>
+            <div class="row" id="earringsRow">
+                <div class="item" data-name="Silver Studs" data-price="50">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Studs', 50, 'img/e1.jpg')">❤️</button>
+                    <img src="img/e1.jpg" alt="Silver Studs">
+                    <p class="name"><b>Silver Studs</b></p>
+                    <p class="price"><b>$50.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Silver Studs', 50, 'img/e1.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Silver Earrings" data-price="60">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Earrings', 60, 'img/e2.jpg')">❤️</button>
+                    <img src="img/e2.jpg" alt="Silver Earrings">
+                    <p class="name"><b>Silver Earrings</b></p>
+                    <p class="price"><b>$60.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Silver Earrings', 60, 'img/e2.jpg')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Golden Studs" data-price="70">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Studs', 70, 'img/e3.webp')">❤️</button>
+                    <img src="img/e3.webp" alt="Golden Studs">
+                    <p class="name"><b>Golden Studs</b></p>
+                    <p class="price"><b>$70.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Golden Studs', 70, 'img/e3.webp')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Diamond Studs" data-price="90">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Studs', 90, 'img/e4.avif')">❤️</button>
+                    <img src="img/e4.avif" alt="Diamond Studs">
+                    <p class="name"><b>Diamond Studs</b></p>
+                    <p class="price"><b>$90.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Diamond Studs', 90, 'img/e4.avif')">Add to Cart</button>
+                </div>
+                <div class="item" data-name="Golden Earrings" data-price="85">
+                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Earrings', 85, 'img/e5.avif')">❤️</button>
+                    <img src="img/e5.avif" alt="Golden Earrings">
+                    <p class="name"><b>Golden Earrings</b></p>
+                    <p class="price"><b>$85.00</b></p>
+                    <button class="cart-button" onclick="addToCart('Golden Earrings', 85, 'img/e5.avif')">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>✨ E-Sparkle Jewelry</h3>
+            <p>Luxury since 2009</p>
+            <p>Premium quality jewelry</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="index.html">Home</a></p>
+            <p><a href="html 1.htm">Shop</a></p>
+            <p><a href="contact1.html">Contact</a></p>
+            <p><a href="sale.html">Sale</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-phone"></i> +92 304-7892953</p>
+            <p><i class="fas fa-envelope"></i> E-sparkle2009@gmail.com</p>
+            <p><i class="fas fa-map-marker-alt"></i> Grand Trump Road, Lahore</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 E-Sparkle Jewelry. All Rights Reserved. | Crafted with ❤️ for elegance</p>
+    </div>
+</footer>
+
+<button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+<script>
+    // ========== CART FUNCTIONALITY ==========
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCartCount() {
+        const count = cart.reduce((total, item) => total + item.quantity, 0);
+        const cartBadge = document.getElementById('cartCount');
+        if (cartBadge) cartBadge.innerText = count;
+    }
+
+    function addToCart(name, price, image) {
+        let existingItem = cart.find(item => item.name === name);
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            cart.push({ id: Date.now(), name, price, image, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification(`${name} added to cart!`, 'success');
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification('Item removed from cart!', 'info');
+    }
+
+    function viewCart() {
+        if (cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+        let cartItems = cart.map((item, index) => {
+            return `${index + 1}. ${item.name} - $${item.price} x ${item.quantity} = $${item.price * item.quantity}`;
+        }).join('\n');
+        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let response = prompt(`🛒 YOUR CART 🛒\n\n${cartItems}\n\n📦 Total Items: ${cart.reduce((t, i) => t + i.quantity, 0)}\n💰 Total: $${total}\n\nEnter item number to remove, or type "clear" to empty cart:\n(Leave empty to close)`);
+        
+        if (response && response.toLowerCase() === 'clear') {
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showNotification('Cart cleared!', 'info');
+            viewCart();
+        } else if (response && !isNaN(response)) {
+            let index = parseInt(response) - 1;
+            if (index >= 0 && index < cart.length) {
+                removeFromCart(cart[index].id);
+                viewCart();
+            } else {
+                alert('Invalid item number!');
+            }
+        }
+    }
+
+    function showNotification(message, type) {
+        let notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `<span>✨ ${message} ✨</span>`;
+        notification.style.background = type === 'success' ? '#27ae60' : '#d4af37';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
+    }
+
+    // ========== WISHLIST ==========
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+    function toggleWishlist(name, price, image) {
+        let exists = wishlist.find(item => item.name === name);
+        if (exists) {
+            wishlist = wishlist.filter(item => item.name !== name);
+            showNotification(`Removed ${name} from wishlist`, 'info');
+        } else {
+            wishlist.push({ name, price, image });
+            showNotification(`❤️ Added ${name} to wishlist`, 'success');
+        }
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    }
+
+    // ========== SEARCH FUNCTION ==========
+    function searchProducts() {
+        let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        let products = document.querySelectorAll('.item');
+        let foundCount = 0;
+        
+        if (searchTerm === '') { clearSearch(); return; }
+        
+        products.forEach(product => {
+            let title = product.querySelector('.name')?.innerText.toLowerCase() || '';
+            if (title.includes(searchTerm)) {
+                product.style.display = 'block';
+                product.style.border = '2px solid #d4af37';
+                foundCount++;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+        
+        let msgDiv = document.getElementById('searchMessage');
+        msgDiv.style.display = 'block';
+        msgDiv.innerHTML = foundCount > 0 ? 
+            `🔍 Found ${foundCount} product(s) matching "${searchTerm}" <button class="clear-search" onclick="clearSearch()">Clear</button>` :
+            `❌ No products found matching "${searchTerm}" <button class="clear-search" onclick="clearSearch()">Clear</button>`;
+    }
+
+    function clearSearch() {
+        let products = document.querySelectorAll('.item');
+        products.forEach(product => {
+            product.style.display = 'block';
+            product.style.border = '1px solid #2a2a2a';
+        });
+        document.getElementById('searchMessage').style.display = 'none';
+        document.getElementById('searchInput').value = '';
+    }
+
+    // ========== FILTER & SORT ==========
+    function filterByPrice(min, max) {
+        let products = document.querySelectorAll('.item');
+        let visibleCount = 0;
+        products.forEach(product => {
+            let price = parseFloat(product.getAttribute('data-price'));
+            if (price >= min && price <= max) {
+                product.style.display = 'block';
+                visibleCount++;
+            } else {
+                product.style.display = 'none';
+            }
+        });
+        showNotification(`Showing ${visibleCount} products in $${min} - $${max} range`, 'info');
+    }
+
+    function sortProducts(order) {
+        let allProducts = Array.from(document.querySelectorAll('.item'));
+        let containers = document.querySelectorAll('.row');
+        
+        containers.forEach(container => container.innerHTML = '');
+        
+        allProducts.sort((a, b) => {
+            let priceA = parseFloat(a.getAttribute('data-price'));
+            let priceB = parseFloat(b.getAttribute('data-price'));
+            return order === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        
+        allProducts.forEach((product, index) => {
+            let rowIndex = Math.floor(index / 4);
+            if (containers[rowIndex]) {
+                containers[rowIndex].appendChild(product);
+            }
+        });
+        
+        showNotification(`Sorted by price: ${order === 'asc' ? 'Low to High' : 'High to Low'}`, 'info');
+    }
+
+    function clearFilters() {
+        let products = document.querySelectorAll('.item');
+        products.forEach(product => product.style.display = 'block');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchMessage').style.display = 'none';
+        showNotification('All filters cleared!', 'info');
+    }
+
+    // ========== SCROLL TO TOP ==========
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    window.addEventListener('scroll', () => {
+        let btn = document.getElementById('scrollTopBtn');
+        if (window.scrollY > 300) btn.style.display = 'block';
+        else btn.style.display = 'none';
+    });
+
+    // ========== DROPDOWN MENU ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+        
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closest('.dropdown').classList.toggle('open');
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown.open').forEach(drop => {
+                if (!drop.contains(e.target)) drop.classList.remove('open');
+            });
+        });
+        
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchProducts();
+        });
+    });
+</script>
+</body>
+</html>

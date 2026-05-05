@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - E-Sparkle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 2rem;
+        }
+        .cart-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #141414;
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        th {
+            color: #d4af37;
+        }
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .remove-btn:hover { background: #c0392b; }
+        .quantity-btn {
+            background: #d4af37;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .total {
+            text-align: right;
+            padding: 1rem;
+            font-size: 1.5rem;
+            color: #d4af37;
+        }
+        .checkout {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        .back-btn {
+            background: #d4af37;
+            color: #0a0a0a;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-right: 1rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <h1 style="color:#d4af37;">🛒 Your Cart</h1>
+        <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+        <div id="cartContent"></div>
+    </div>
+    
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function displayCart() {
+            let container = document.getElementById('cartContent');
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; padding:3rem;">Your cart is empty. <a href="html 1.htm">Start Shopping →</a></p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+            `;
+            let total = 0;
+            cart.forEach(item => {
+                let subtotal = item.price * item.quantity;
+                total += subtotal;
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>$${item.price}</td>
+                        <td>
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                            ${item.quantity}
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </td>
+                        <td>$${subtotal}</td>
+                        <td><button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button></td>
+                    </tr>
+                `;
+            });
+            html += `</table><div class="total">Total: $${total}</div>`;
+            html += `<button class="checkout" onclick="checkout()">Proceed to Checkout →</button>`;
+            container.innerHTML = html;
+        }
+
+        function updateQuantity(id, change) {
+            let item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity < 1) {
+                    removeFromCart(id);
+                } else {
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    displayCart();
+                    updateCartCount();
+                }
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateCartCount();
+        }
+
+        function checkout() {
+            alert('Thank you for shopping! Total: $' + cart.reduce((s, i) => s + (i.price * i.quantity), 0));
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            let count = cart.reduce((s, i) => s + i.quantity, 0);
+            let badge = document.getElementById('cartCount');
+            if (badge) badge.innerText = count;
+        }
+
+        displayCart();
+    </script>
+</body>
+</html>

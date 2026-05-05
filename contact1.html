@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Sparkle | Contact Us</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+        background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
+        text-align: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #d4af37;
+        position: relative;
+    }
+
+    .logo img {
+        max-width: 300px;
+        width: 80%;
+        filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));
+    }
+
+    /* Navigation */
+    .navbar {
+        background: #0f0f0f;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #e0e0e0;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    nav ul li a:hover { color: #d4af37; }
+
+    /* Cart Badge */
+    .cart-badge {
+        background: #e67e22;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 10px;
+        position: absolute;
+        top: -8px;
+        right: -12px;
+    }
+
+    /* Dropdown */
+    .dropdown { position: relative; }
+    .dropdown-menu {
+        position: absolute;
+        top: 150%;
+        left: 0;
+        background: #1a1a1a;
+        min-width: 140px;
+        border-radius: 12px;
+        padding: 0.5rem 0;
+        display: none;
+        border: 1px solid #d4af37;
+    }
+    .dropdown.open .dropdown-menu { display: block; }
+    .dropdown-menu li { display: block; margin: 0; }
+    .dropdown-menu li a {
+        display: block;
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+    .dropdown-menu li a:hover { background: #2a2a2a; }
+    .dropdown-toggle::after {
+        content: "▼";
+        font-size: 0.6rem;
+        margin-left: 5px;
+        display: inline-block;
+    }
+
+    /* Search */
+    .search-li { margin-left: auto; }
+    .search-box { display: flex; gap: 5px; align-items: center; }
+    .search-box input {
+        padding: 5px 10px;
+        border: 2px solid #333;
+        border-radius: 30px;
+        background: #1a1a1a;
+        color: #fff;
+        outline: none;
+        width: 120px;
+        font-size: 0.75rem;
+    }
+    .search-box input:focus { border-color: #d4af37; }
+    .search-box button {
+        background: #d4af37;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .search-box button i { font-size: 0.7rem; color: #0a0a0a; }
+
+    .navbar h2 {
+        text-align: center;
+        margin-top: 0.5rem;
+        color: #d4af37;
+        font-size: 0.8rem;
+    }
+
+    /* Contact Content */
+    .content {
+        text-align: center;
+        padding: 3rem 1rem 2rem;
+    }
+    .content h1 {
+        font-size: 2rem;
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+    .content p {
+        font-size: 0.9rem;
+        color: #bbb;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    /* Contact Section */
+    .contact {
+        padding: 1rem 2rem 4rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .contact .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    /* Contact Info */
+    .contactInfo {
+        flex: 1;
+        min-width: 280px;
+        background: #141414;
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid #2a2a2a;
+    }
+    .box, .item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .icon {
+        font-size: 1.3rem;
+        color: #d4af37;
+        width: 40px;
+    }
+    .text h2 {
+        font-size: 1.1rem;
+        color: #d4af37;
+        margin-bottom: 0.3rem;
+    }
+    .text span {
+        font-size: 0.85rem;
+        color: #bbb;
+        line-height: 1.5;
+    }
+
+    /* Contact Form */
+    .contactForm {
+        flex: 1;
+        min-width: 300px;
+        background: #141414;
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid #2a2a2a;
+    }
+    .contactForm h2 {
+        font-size: 1.5rem;
+        color: #d4af37;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #d4af37;
+        padding-left: 1rem;
+    }
+    .inputBox {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    .inputBox input, .inputBox textarea {
+        width: 100%;
+        padding: 12px 0 8px;
+        border: none;
+        border-bottom: 2px solid #333;
+        outline: none;
+        font-size: 0.9rem;
+        background: transparent;
+        color: #fff;
+        font-family: inherit;
+    }
+    .inputBox textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .inputBox span {
+        position: absolute;
+        left: 0;
+        top: 12px;
+        font-size: 0.9rem;
+        color: #888;
+        pointer-events: none;
+        transition: 0.3s;
+    }
+    .inputBox input:focus ~ span,
+    .inputBox input:valid ~ span,
+    .inputBox textarea:focus ~ span,
+    .inputBox textarea:valid ~ span {
+        top: -12px;
+        font-size: 0.7rem;
+        color: #d4af37;
+    }
+    .inputBox input:focus, .inputBox textarea:focus {
+        border-bottom-color: #d4af37;
+    }
+    .inputBox input[type="submit"] {
+        background: #d4af37;
+        color: #0a0a0a;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        width: auto;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+        font-size: 0.85rem;
+    }
+    .inputBox input[type="submit"]:hover {
+        background: #f0c45a;
+        transform: scale(1.02);
+    }
+
+    /* Footer */
+    footer {
+        background: #050505;
+        padding: 2rem 2rem 1rem;
+        border-top: 1px solid #d4af37;
+        margin-top: 2rem;
+    }
+    .footer-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+    .footer-section h3 {
+        color: #d4af37;
+        margin-bottom: 0.8rem;
+        font-size: 1rem;
+    }
+    .footer-section p, .footer-section a {
+        color: #bbb;
+        text-decoration: none;
+        line-height: 1.6;
+        font-size: 0.8rem;
+    }
+    .footer-section a:hover { color: #d4af37; }
+    .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    .social-icons a i {
+        font-size: 1.2rem;
+        color: #bbb;
+        transition: 0.3s;
+    }
+    .social-icons a i:hover { color: #d4af37; transform: translateY(-2px); }
+    .footer-bottom {
+        text-align: center;
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+        border-top: 1px solid #1a1a1a;
+        color: #666;
+        font-size: 0.7rem;
+    }
+
+    /* Notification */
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        font-size: 0.85rem;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+        .search-li { margin-left: 0; width: 100%; margin-top: 5px; }
+        .search-box { justify-content: center; }
+        .search-box input { width: 180px; }
+        .content h1 { font-size: 1.5rem; }
+        .contact .container { flex-direction: column; }
+        .contact { padding: 1rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/300x100?text=E-SPARKLE'">
+    </div>
+</header>
+
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b> Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b> Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale </a></b></li>
+            <li style="position: relative;">
+                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+            </li>
+            <li class="search-li">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search...">
+                    <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                </div>
+            </li>
+        </ul>
+        <h2><i>Enhance your Elegance with the ultimate Sparkle ✨</i> 💎</h2>
+    </nav>
+</div>
+
+<main>
+    <div class="content">
+        <h1>📞 GET IN TOUCH!!</h1>
+        <p>Reach out to us by filling in the details below<br>and we'll revert soon</p>
+    </div>
+
+    <section class="contact">
+        <div class="container">
+            <div class="contactInfo">
+                <div class="box">
+                    <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="text">
+                        <h2>Address</h2>
+                        <span>E-sparkle Jewellers,<br>Grand Trump Road,<br>Main Lahore.</span>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="text">
+                        <h2>Phone</h2>
+                        <span>+92 304-7892953</span>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="icon"><i class="fas fa-envelope"></i></div>
+                    <div class="text">
+                        <h2>E-mail</h2>
+                        <span>E-sparkle2009@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contactForm">
+                <form id="contactForm">
+                    <h2>Send Message</h2>
+                    <div class="inputBox">
+                        <input type="text" id="fullname" required>
+                        <span>Full Name</span>
+                    </div>
+                    <div class="inputBox">
+                        <input type="email" id="email" required>
+                        <span>E-mail</span>
+                    </div>
+                    <div class="inputBox">
+                        <textarea id="message" required></textarea>
+                        <span>Type Your Message...</span>
+                    </div>
+                    <div class="inputBox">
+                        <input type="submit" value="Send Message">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>✨ E-Sparkle Jewelry</h3>
+            <p>Luxury since 2009</p>
+            <p>Premium quality jewelry</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="index.html">Home</a></p>
+            <p><a href="html 1.htm">Shop</a></p>
+            <p><a href="contact1.html">Contact</a></p>
+            <p><a href="sale.html">Sale</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-phone"></i> +92 304-7892953</p>
+            <p><i class="fas fa-envelope"></i> E-sparkle2009@gmail.com</p>
+            <p><i class="fas fa-map-marker-alt"></i> Grand Trump Road, Lahore</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 E-Sparkle Jewelry. All Rights Reserved. | Crafted with ❤️ for elegance</p>
+    </div>
+</footer>
+
+<script>
+    // Load cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCartCount() {
+        const count = cart.reduce((total, item) => total + item.quantity, 0);
+        const badge = document.getElementById('cartCount');
+        if (badge) badge.innerText = count;
+    }
+
+    function showNotification(message, type = 'success') {
+        let notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `<span>✨ ${message} ✨</span>`;
+        notification.style.background = type === 'success' ? '#27ae60' : '#d4af37';
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
+    }
+
+    // Search function (for consistency)
+    function searchProducts() {
+        let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (searchTerm) {
+            showNotification(`Searching for "${searchTerm}" - Feature coming soon!`, 'info');
+        }
+    }
+
+    // Contact Form
+    document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let name = document.getElementById('fullname').value;
+        let email = document.getElementById('email').value;
+        let message = document.getElementById('message').value;
+        
+        if(name && email && message) {
+            showNotification(`Thank you ${name}! We'll contact you soon!`, 'success');
+            this.reset();
+        } else {
+            showNotification('Please fill all fields!', 'info');
+        }
+    });
+
+    // Dropdown menu
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+        
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closest('.dropdown').classList.toggle('open');
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown.open').forEach(drop => {
+                if (!drop.contains(e.target)) drop.classList.remove('open');
+            });
+        });
+
+        // Enter key search
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchProducts();
+        });
+    });
+</script>
+
+</body>
+</html>

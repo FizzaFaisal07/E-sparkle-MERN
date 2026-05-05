@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Sparkle | Luxury Jewelry</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+        background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
+        text-align: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #d4af37;
+        position: relative;
+    }
+
+    .logo img {
+        max-width: 300px;
+        width: 80%;
+        filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));
+    }
+
+    /* Navigation */
+    .navbar {
+        background: #0f0f0f;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #e0e0e0;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    nav ul li a:hover { color: #d4af37; }
+
+    /* Dropdown */
+    .dropdown { position: relative; }
+    .dropdown-menu {
+        position: absolute;
+        top: 150%;
+        left: 0;
+        background: #1a1a1a;
+        min-width: 180px;
+        border-radius: 12px;
+        padding: 0.7rem 0;
+        display: none;
+        border: 1px solid #d4af37;
+    }
+    .dropdown.open .dropdown-menu { display: block; }
+    .dropdown-menu li { display: block; margin: 0; }
+    .dropdown-menu li a {
+        display: block;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    .dropdown-menu li a:hover { background: #2a2a2a; }
+    .dropdown-toggle::after {
+        content: "▼";
+        font-size: 0.7rem;
+        margin-left: 5px;
+        display: inline-block;
+    }
+
+    /* Search */
+    .search-li { margin-left: auto; }
+    .search-box { display: flex; gap: px; }
+    .search-box input {
+        padding: 8px 15px;
+        border: 2px solid #333;
+        border-radius: 30px;
+        background: #1a1a1a;
+        color: #fff;
+        outline: none;
+    }
+    .search-box input:focus { border-color: #d4af37; }
+    .search-box button {
+        background: #d4af37;
+        border: none;
+        width: 32px;        
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .navbar h2 {
+        text-align: center;
+        margin-top: 1rem;
+        color: #d4af37;
+        font-size: 1rem;
+    }
+
+    /* Slider */
+   /* Slider */
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 550px;
+    overflow: hidden;
+    background: #000;
+}
+
+.slider {
+    display: flex;
+    width: 300%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.slide {
+    width: 33.333%;
+    height: 100%;
+    position: relative;
+}
+
+
+/* For all slides */
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* For problematic slide only */
+.slide-problem img {
+    object-fit: contain;
+    background: #000;
+}
+
+/* OR use different positioning */
+.slide-problem img {
+    object-fit: cover;
+    object-position: top center;  /* Change focus point */
+}
+/* For different screen sizes */
+@media (max-width: 768px) {
+    .slider-container {
+        height: 350px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider-container {
+        height: 250px;
+    }
+}
+    .slide-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+    }
+    .slide-content {
+        position: absolute;
+        bottom: 25%;
+        left: 10%;
+        z-index: 2;
+    }
+    .slide-content h2 {
+        font-size: 3rem;
+        color: #d4af37;
+        margin-bottom: 0.5rem;
+    }
+    .slide-content p {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+    .slide-content button {
+        background: #d4af37;
+        color: #0a0a0a;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .slide-content button:hover { background: #f0c45a; transform: scale(1.05); }
+
+    .slider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.6);
+        color: #d4af37;
+        border: 2px solid #d4af37;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    .prev { left: 20px; }
+    .next { right: 20px; }
+    .slider-btn:hover { background: #d4af37; color: #0a0a0a; }
+
+    .dots {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+    }
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.5);
+        cursor: pointer;
+    }
+    .dot.active { background: #d4af37; width: 30px; border-radius: 10px; }
+
+    /* Categories Section */
+    .categories {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: #0a0a0a;
+    }
+    .section-title {
+        font-size: 2.5rem;
+        color: #d4af37;
+        margin-bottom: 2rem;
+    }
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: #d4af37;
+        margin: 10px auto;
+    }
+    .category-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .category-card {
+        background: #141414;
+        padding: 2rem;
+        text-align: center;
+        border-radius: 15px;
+        width: 200px;
+        cursor: pointer;
+        transition: 0.3s;
+        border: 1px solid #2a2a2a;
+    }
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: #d4af37;
+        box-shadow: 0 10px 25px rgba(212,175,55,0.2);
+    }
+    .category-card i {
+        font-size: 2.5rem;
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+    .category-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .category-card p {
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    /* Featured Products */
+    .featured {
+        padding: 4rem 2rem;
+        background: #0f0f0f;
+    }
+    .featured-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .product-card {
+        width: 240px;
+        background: #141414;
+        border-radius: 12px;
+        overflow: hidden;
+        text-align: center;
+        transition: 0.3s;
+        border: 1px solid #2a2a2a;
+        cursor: pointer;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        border-color: #d4af37;
+    }
+    .product-card img {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+    }
+    .product-card h3 {
+        padding: 1rem 0 0.5rem;
+        color: #d4af37;
+    }
+    .product-card p {
+        padding-bottom: 1rem;
+        color: #f0c45a;
+        font-weight: bold;
+    }
+
+ 
+    @media (max-width: 768px) {
+        nav ul { justify-content: center; gap: 1rem; }
+        .search-li { margin-left: 0; width: 100%; margin-top: 10px; }
+        .slider-container { height: 350px; }
+        .slide-content h2 { font-size: 1.5rem; }
+        .slide-content p { font-size: 0.8rem; }
+        .section-title { font-size: 1.8rem; }
+        .category-card { width: 160px; padding: 1.5rem; }
+        .product-card { width: 180px; }
+        .footer-container { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/300x100?text=E-SPARKLE'">
+    </div>
+</header>
+
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b>Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+<li class="search-li">
+    <div class="search-box">
+        <form class="search-form" onsubmit="event.preventDefault(); alert('Search feature coming soon!');">
+            <input type="text" placeholder="Search...">
+            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+        </form>
+    </div>
+</li>
+        </ul>
+        <h2><i>Enhance your Elegance with the ultimate Sparkle ✨</i> 💎</h2>
+    </nav>
+</div>
+
+<main>
+    <!-- SLIDER -->
+    <div class="slider-container">
+        <div class="slider" id="slider">
+            <div class="slide">
+                <img src="img/h2.webp" alt="Diamond Collection">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h2>Diamond Elegance</h2>
+                    <p>Discover our exquisite diamond collection</p>
+                    <button onclick="location.href='html 1.htm'">Shop Now →</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="img/h1.jpg" alt="Gold Jewelry">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h2>Gold Perfection</h2>
+                    <p>Timeless gold pieces for every occasion</p>
+                    <button onclick="location.href='html 1.htm'">Explore →</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="img/h5.jpg" alt="Bridal Collection">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <h2>Bridal Special</h2>
+                    <p>Make your big day unforgettable</p>
+                    <button onclick="location.href='sale.html'">View Sale →</button>
+                </div>
+            </div>
+        </div>
+        <button class="slider-btn prev" onclick="prevSlide()">❮</button>
+        <button class="slider-btn next" onclick="nextSlide()">❯</button>
+        <div class="dots">
+            <div class="dot active" onclick="currentSlide(0)"></div>
+            <div class="dot" onclick="currentSlide(1)"></div>
+            <div class="dot" onclick="currentSlide(2)"></div>
+        </div>
+    </div>
+
+    <!-- SHOP BY CATEGORY -->
+    <div class="categories">
+        <h2 class="section-title">Shop by Category ✨</h2>
+        <div class="category-grid">
+            <div class="category-card" onclick="location.href='html 1.htm'">
+                <i class="fas fa-gem"></i>
+                <h3>Necklaces</h3>
+                <p>Elegant designs</p>
+            </div>
+            <div class="category-card" onclick="location.href='html 1.htm'">
+                <i class="fas fa-ring"></i>
+                <h3>Rings</h3>
+                <p>Timeless love</p>
+            </div>
+            <div class="category-card" onclick="location.href='html 1.htm'">
+                <i class="fas fa-star"></i>
+                <h3>Earrings</h3>
+                <p>Shine bright</p>
+            </div>
+            <div class="category-card" onclick="location.href='html2.htm'">
+                <i class="fas fa-hand-peace"></i>
+                <h3>Bangles</h3>
+                <p>Traditional</p>
+            </div>
+            <div class="category-card" onclick="location.href='sale.html'">
+                <i class="fas fa-fire"></i>
+                <h3>Sale</h3>
+                <p>Up to 30% off</p>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>✨ E-Sparkle Jewelry</h3>
+            <p>Luxury since 2009</p>
+            <p>Premium quality jewelry</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="index.html">Home</a></p>
+            <p><a href="html 1.htm">Shop</a></p>
+            <p><a href="contact1.html">Contact</a></p>
+            <p><a href="sale.html">Sale</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-phone"></i> +92 304-7892953</p>
+            <p><i class="fas fa-envelope"></i> E-sparkle2009@gmail.com</p>
+            <p><i class="fas fa-map-marker-alt"></i> Grand Trump Road, Lahore</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.youtube.com/" target="_blank"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 E-Sparkle Jewelry. All Rights Reserved. | Crafted with ❤️ for elegance</p>
+    </div>
+</footer>
+
+<style>
+    footer {
+        background: #050505;
+        padding: 2rem 2rem 1rem;
+        border-top: 1px solid #d4af37;
+        margin-top: 3rem;
+    }
+    .footer-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+   .footer-section h3 {
+        color: #d4af37;
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+    }
+    .footer-section p, .footer-section a {
+        color: #bbb;
+        text-decoration: none;
+        line-height: 1.6;
+        font-size: 0.85rem;
+    }
+    .footer-section a:hover { color: #d4af37; }
+    .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    .social-icons a i {
+        font-size: 1.3rem;
+        color: #bbb;
+        transition: 0.3s;
+    }
+    .social-icons a i:hover { color: #d4af37; transform: translateY(-2px); }
+    .footer-bottom {
+        text-align: center;
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+        border-top: 1px solid #1a1a1a;
+        color: #666;
+        font-size: 0.75rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+        .search-li { margin-left: 0; width: 100%; margin-top: 5px; }
+        .search-box { justify-content: center; }
+        .search-box input { width: 180px; }
+        h1 { font-size: 1.8rem; }
+        .item { width: 180px; }
+        .item img { height: 180px; }
+        .footer-container { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+    }
+</style>
+
+<script>
+    // Slider
+    let currentIndex = 0;
+    const slider = document.getElementById('slider');
+    const dots = document.querySelectorAll('.dot');
+    let autoSlide;
+
+    function updateSlider() {
+        slider.style.transform = `translateX(-${currentIndex * 33.333}%)`;
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+    }
+    function nextSlide() { currentIndex = (currentIndex + 1) % 3; updateSlider(); resetAuto(); }
+    function prevSlide() { currentIndex = (currentIndex - 1 + 3) % 3; updateSlider(); resetAuto(); }
+    function currentSlide(i) { currentIndex = i; updateSlider(); resetAuto(); }
+    function startAuto() { autoSlide = setInterval(() => nextSlide(), 5000); }
+    function resetAuto() { clearInterval(autoSlide); startAuto(); }
+    startAuto();
+
+    // Dropdown
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.closest('.dropdown').classList.toggle('open');
+        });
+    });
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown.open').forEach(drop => {
+            if (!drop.contains(e.target)) drop.classList.remove('open');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -21,7 +21,7 @@
     }
 
     /* Header */
- header {
+    header {
         background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
         text-align: center;
         padding: 10px 0;
@@ -159,6 +159,10 @@
         font-size: 0.7rem;
     }
     .filter-bar button:hover {
+        background: #d4af37;
+        color: #0a0a0a;
+    }
+    .filter-bar button.active-filter {
         background: #d4af37;
         color: #0a0a0a;
     }
@@ -316,14 +320,18 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: #27ae60;
-        color: white;
-        padding: 10px 18px;
+        padding: 12px 20px;
         border-radius: 10px;
+        color: white;
         z-index: 9999;
         animation: slideIn 0.3s ease;
         font-size: 0.85rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
     }
+    .notification.success { background: #27ae60; }
+    .notification.error { background: #e74c3c; }
+    .notification.info { background: #d4af37; color: #0a0a0a; }
+
     @keyframes slideIn {
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
@@ -370,30 +378,31 @@
 
 <div class="navbar">
     <nav>
-        <ul>
-            <li><b><a href="index.html">Home</a></b></li>
-            <li class="dropdown">
-                <b><a href="#" class="dropdown-toggle">Shop</a></b>
-                <ul class="dropdown-menu">
-                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
-                    <li><a href="html 1.htm"><b>Rings</b></a></li>
-                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
-                    <li><a href="html2.htm"><b>Bangles</b></a></li>
-                    <li><a href="html2.htm"><b>Watches</b></a></li>
-                </ul>
-            </li>
-            <li><b><a href="contact1.html">Contact</a></b></li>
-            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
-<li style="position: relative;">
-    <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
-</li>
-            <li class="search-li">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search...">
-                    <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
-                </div>
-            </li>
+       <ul>
+    <li><b><a href="index.html">Home</a></b></li>
+    <li class="dropdown">
+        <b><a href="#" class="dropdown-toggle">Shop</a></b>
+        <ul class="dropdown-menu">
+            <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+            <li><a href="html 1.htm"><b>Rings</b></a></li>
+            <li><a href="html 1.htm"><b>Earrings</b></a></li>
+            <li><a href="html2.htm"><b>Bangles</b></a></li>
+            <li><a href="html2.htm"><b>Watches</b></a></li>
         </ul>
+    </li>
+    <li><b><a href="contact1.html">Contact</a></b></li>
+    <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+    <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+    <li style="position: relative;">
+        <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+    </li>
+    <li class="search-li">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+        </div>
+    </li>
+</ul>
         <h2><i>Enhance your Elegance with the ultimate Sparkle ✨</i> 💎</h2>
     </nav>
 </div>
@@ -416,174 +425,20 @@
     <div class="container">
         <!-- Necklaces Section -->
         <section id="necklaces">
-            <h1>Necklaces </h1>
-            <div class="row" id="necklacesRow">
-                <div class="item" data-name="Flower Necklace" data-price="180">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Flower Necklace', 180, 'img/n1.jpg')">❤️</button>
-                    <img src="img/n1.jpg" alt="Flower Necklace">
-                    <p class="name"><b>Flower Necklace</b></p>
-                    <p class="price"><b>$180.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Flower Necklace', 180, 'img/n1.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Gold Set" data-price="190">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Set', 190, 'img/n2.jpg')">❤️</button>
-                    <img src="img/n2.jpg" alt="Gold Set">
-                    <p class="name"><b>Gold Set</b></p>
-                    <p class="price"><b>$190.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Gold Set', 190, 'img/n2.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Heart Pendant" data-price="95">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Heart Pendant', 95, 'img/n3.jpg')">❤️</button>
-                    <img src="img/n3.jpg" alt="Heart Pendant">
-                    <p class="name"><b>Heart Pendant</b></p>
-                    <p class="price"><b>$95.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Heart Pendant', 95, 'img/n3.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Diamond Necklace" data-price="210">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Necklace', 210, 'img/n4.jpg')">❤️</button>
-                    <img src="img/n4.jpg" alt="Diamond Necklace">
-                    <p class="name"><b>Diamond Necklace</b></p>
-                    <p class="price"><b>$210.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Diamond Necklace', 210, 'img/n4.jpg')">Add to Cart</button>
-                </div>
-            </div>
-            <div class="row" id="necklacesRow2">
-                <div class="item" data-name="Gold Necklace" data-price="100">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Necklace', 100, 'img/n5.jpg')">❤️</button>
-                    <img src="img/n5.jpg" alt="Gold Necklace">
-                    <p class="name"><b>Gold Necklace</b></p>
-                    <p class="price"><b>$100.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Gold Necklace', 100, 'img/n5.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Red Silver Set" data-price="195">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Red Silver Set', 195, 'img/n6.webp')">❤️</button>
-                    <img src="img/n6.webp" alt="Red Silver Set">
-                    <p class="name"><b>Red Silver Set</b></p>
-                    <p class="price"><b>$195.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Red Silver Set', 195, 'img/n6.webp')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Gold Pendant" data-price="85">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Pendant', 85, 'img/n7.webp')">❤️</button>
-                    <img src="img/n7.webp" alt="Gold Pendant">
-                    <p class="name"><b>Gold Pendant</b></p>
-                    <p class="price"><b>$85.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Gold Pendant', 85, 'img/n7.webp')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Silver Necklace" data-price="250">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Necklace', 250, 'img/n8.webp')">❤️</button>
-                    <img src="img/n8.webp" alt="Silver Necklace">
-                    <p class="name"><b>Silver Necklace</b></p>
-                    <p class="price"><b>$250.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Silver Necklace', 250, 'img/n8.webp')">Add to Cart</button>
-                </div>
-            </div>
+            <h1>Necklaces</h1>
+            <div class="row" id="necklacesRow"></div>
         </section>
 
         <!-- Rings Section -->
         <section id="rings">
-            <h1>Rings </h1>
-            <div class="row" id="ringsRow">
-                <div class="item" data-name="Diamond Ring" data-price="200">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Ring', 200, 'img/r1.jpg')">❤️</button>
-                    <img src="img/r1.jpg" alt="Diamond Ring">
-                    <p class="name"><b>Diamond Ring</b></p>
-                    <p class="price"><b>$200.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Diamond Ring', 200, 'img/r1.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Simple Ring" data-price="90">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Simple Ring', 90, 'img/r2.webp')">❤️</button>
-                    <img src="img/r2.webp" alt="Simple Ring">
-                    <p class="name"><b>Simple Ring</b></p>
-                    <p class="price"><b>$90.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Simple Ring', 90, 'img/r2.webp')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Gold Ring" data-price="110">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Gold Ring', 110, 'img/r3.avif')">❤️</button>
-                    <img src="img/r3.avif" alt="Gold Ring">
-                    <p class="name"><b>Gold Ring</b></p>
-                    <p class="price"><b>$110.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Gold Ring', 110, 'img/r3.avif')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Diamond Ring 2" data-price="145">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Ring 2', 145, 'img/r4.jpg')">❤️</button>
-                    <img src="img/r4.jpg" alt="Diamond Ring">
-                    <p class="name"><b>Diamond Ring</b></p>
-                    <p class="price"><b>$145.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Diamond Ring 2', 145, 'img/r4.jpg')">Add to Cart</button>
-                </div>
-            </div>
-            <div class="row" id="ringsRow2">
-                <div class="item" data-name="Golden Ring" data-price="80">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Ring', 80, 'img/r5.jpg')">❤️</button>
-                    <img src="img/r5.jpg" alt="Golden Ring">
-                    <p class="name"><b>Golden Ring</b></p>
-                    <p class="price"><b>$80.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Golden Ring', 80, 'img/r5.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Silver Ring" data-price="120">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Ring', 120, 'img/r6.webp')">❤️</button>
-                    <img src="img/r6.webp" alt="Silver Ring">
-                    <p class="name"><b>Silver Ring</b></p>
-                    <p class="price"><b>$120.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Silver Ring', 120, 'img/r6.webp')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Flower Ring" data-price="110">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Flower Ring', 110, 'img/r7.jpg')">❤️</button>
-                    <img src="img/r7.jpg" alt="Flower Ring">
-                    <p class="name"><b>Flower Ring</b></p>
-                    <p class="price"><b>$110.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Flower Ring', 110, 'img/r7.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Golden Ring 2" data-price="96">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Ring 2', 96, 'img/r8.webp')">❤️</button>
-                    <img src="img/r8.webp" alt="Golden Ring">
-                    <p class="name"><b>Golden Ring</b></p>
-                    <p class="price"><b>$96.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Golden Ring 2', 96, 'img/r8.webp')">Add to Cart</button>
-                </div>
-            </div>
+            <h1>Rings</h1>
+            <div class="row" id="ringsRow"></div>
         </section>
 
         <!-- Earrings Section -->
         <section id="earrings">
             <h1>💎 Earrings 💎</h1>
-            <div class="row" id="earringsRow">
-                <div class="item" data-name="Silver Studs" data-price="50">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Studs', 50, 'img/e1.jpg')">❤️</button>
-                    <img src="img/e1.jpg" alt="Silver Studs">
-                    <p class="name"><b>Silver Studs</b></p>
-                    <p class="price"><b>$50.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Silver Studs', 50, 'img/e1.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Silver Earrings" data-price="60">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Silver Earrings', 60, 'img/e2.jpg')">❤️</button>
-                    <img src="img/e2.jpg" alt="Silver Earrings">
-                    <p class="name"><b>Silver Earrings</b></p>
-                    <p class="price"><b>$60.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Silver Earrings', 60, 'img/e2.jpg')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Golden Studs" data-price="70">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Studs', 70, 'img/e3.webp')">❤️</button>
-                    <img src="img/e3.webp" alt="Golden Studs">
-                    <p class="name"><b>Golden Studs</b></p>
-                    <p class="price"><b>$70.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Golden Studs', 70, 'img/e3.webp')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Diamond Studs" data-price="90">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Diamond Studs', 90, 'img/e4.avif')">❤️</button>
-                    <img src="img/e4.avif" alt="Diamond Studs">
-                    <p class="name"><b>Diamond Studs</b></p>
-                    <p class="price"><b>$90.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Diamond Studs', 90, 'img/e4.avif')">Add to Cart</button>
-                </div>
-                <div class="item" data-name="Golden Earrings" data-price="85">
-                    <button class="wishlist-btn" onclick="toggleWishlist('Golden Earrings', 85, 'img/e5.avif')">❤️</button>
-                    <img src="img/e5.avif" alt="Golden Earrings">
-                    <p class="name"><b>Golden Earrings</b></p>
-                    <p class="price"><b>$85.00</b></p>
-                    <button class="cart-button" onclick="addToCart('Golden Earrings', 85, 'img/e5.avif')">Add to Cart</button>
-                </div>
-            </div>
+            <div class="row" id="earringsRow"></div>
         </section>
     </div>
 </main>
@@ -625,96 +480,341 @@
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
 
 <script>
-    // ========== CART FUNCTIONALITY ==========
+    // ============================================================
+    // DEFAULT PRODUCTS (Hardcoded - Preserved)
+    // ============================================================
+    var defaultProducts = [
+        // Necklaces
+        { id: 1, name: 'Flower Necklace', price: 180, image: 'img/n1.jpg', category: 'Necklaces' },
+        { id: 2, name: 'Gold Set', price: 190, image: 'img/n2.jpg', category: 'Necklaces' },
+        { id: 3, name: 'Heart Pendant', price: 95, image: 'img/n3.jpg', category: 'Necklaces' },
+        { id: 4, name: 'Diamond Necklace', price: 210, image: 'img/n4.jpg', category: 'Necklaces' },
+        { id: 5, name: 'Gold Necklace', price: 100, image: 'img/n5.jpg', category: 'Necklaces' },
+        { id: 6, name: 'Red Silver Set', price: 195, image: 'img/n6.webp', category: 'Necklaces' },
+        { id: 7, name: 'Gold Pendant', price: 85, image: 'img/n7.webp', category: 'Necklaces' },
+        { id: 8, name: 'Silver Necklace', price: 250, image: 'img/n8.webp', category: 'Necklaces' },
+        // Rings
+        { id: 9, name: 'Diamond Ring', price: 200, image: 'img/r1.jpg', category: 'Rings' },
+        { id: 10, name: 'Simple Ring', price: 90, image: 'img/r2.webp', category: 'Rings' },
+        { id: 11, name: 'Gold Ring', price: 110, image: 'img/r3.avif', category: 'Rings' },
+        { id: 12, name: 'Diamond Ring 2', price: 145, image: 'img/r4.jpg', category: 'Rings' },
+        { id: 13, name: 'Golden Ring', price: 80, image: 'img/r5.jpg', category: 'Rings' },
+        { id: 14, name: 'Silver Ring', price: 120, image: 'img/r6.webp', category: 'Rings' },
+        { id: 15, name: 'Flower Ring', price: 110, image: 'img/r7.jpg', category: 'Rings' },
+        { id: 16, name: 'Golden Ring 2', price: 96, image: 'img/r8.webp', category: 'Rings' },
+        // Earrings
+        { id: 17, name: 'Silver Studs', price: 50, image: 'img/e1.jpg', category: 'Earrings' },
+        { id: 18, name: 'Silver Earrings', price: 60, image: 'img/e2.jpg', category: 'Earrings' },
+        { id: 19, name: 'Golden Studs', price: 70, image: 'img/e3.webp', category: 'Earrings' },
+        { id: 20, name: 'Diamond Studs', price: 90, image: 'img/e4.avif', category: 'Earrings' },
+        { id: 21, name: 'Golden Earrings', price: 85, image: 'img/e5.avif', category: 'Earrings' }
+    ];
+
+    var allProducts = [];
+    var currentFilterMin = 0;
+    var currentFilterMax = 10000;
+
+    // ============================================================
+    // LOAD PRODUCTS - Merge Default + Admin Products
+    // ============================================================
+    function loadProducts() {
+        var adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
+        var storeProducts = JSON.parse(localStorage.getItem('storeProducts')) || [];
+        
+        allProducts = JSON.parse(JSON.stringify(defaultProducts));
+        
+        if (adminProducts.length > 0) {
+            adminProducts.forEach(function(adminProduct) {
+                var existingIndex = allProducts.findIndex(function(p) { 
+                    return p.id === adminProduct.id || p.name === adminProduct.name;
+                });
+                
+                if (existingIndex !== -1) {
+                    allProducts[existingIndex] = {
+                        id: adminProduct.id,
+                        name: adminProduct.name,
+                        price: adminProduct.price,
+                        image: adminProduct.image || allProducts[existingIndex].image,
+                        category: adminProduct.category || allProducts[existingIndex].category
+                    };
+                } else {
+                    allProducts.push({
+                        id: adminProduct.id,
+                        name: adminProduct.name,
+                        price: adminProduct.price,
+                        image: adminProduct.image || 'img/placeholder.jpg',
+                        category: adminProduct.category || 'General'
+                    });
+                }
+            });
+        }
+        
+        if (storeProducts.length > 0) {
+            storeProducts.forEach(function(storeProduct) {
+                var existingIndex = allProducts.findIndex(function(p) { 
+                    return p.id === storeProduct.id;
+                });
+                
+                if (existingIndex !== -1) {
+                    allProducts[existingIndex] = {
+                        id: storeProduct.id,
+                        name: storeProduct.name,
+                        price: storeProduct.price,
+                        image: storeProduct.image || allProducts[existingIndex].image,
+                        category: storeProduct.category || allProducts[existingIndex].category
+                    };
+                } else {
+                    allProducts.push({
+                        id: storeProduct.id,
+                        name: storeProduct.name,
+                        price: storeProduct.price,
+                        image: storeProduct.image || 'img/placeholder.jpg',
+                        category: storeProduct.category || 'General'
+                    });
+                }
+            });
+        }
+        
+        localStorage.setItem('allProducts', JSON.stringify(allProducts));
+        
+        renderAllProducts();
+        return allProducts;
+    }
+
+    // ============================================================
+    // RENDER ALL PRODUCTS
+    // ============================================================
+    function renderAllProducts() {
+        var necklacesProducts = allProducts.filter(function(p) { return p.category === 'Necklaces'; });
+        var ringsProducts = allProducts.filter(function(p) { return p.category === 'Rings'; });
+        var earringsProducts = allProducts.filter(function(p) { return p.category === 'Earrings'; });
+        
+        renderCategoryProducts('necklacesRow', necklacesProducts);
+        renderCategoryProducts('ringsRow', ringsProducts);
+        renderCategoryProducts('earringsRow', earringsProducts);
+    }
+
+    // ============================================================
+    // RENDER PRODUCTS IN A ROW
+    // ============================================================
+    function renderCategoryProducts(rowId, products) {
+        var row = document.getElementById(rowId);
+        if (!row) return;
+        
+        if (!products || products.length === 0) {
+            row.innerHTML = '<div style="text-align:center; padding:2rem; color:#666; width:100%;">No products in this category yet</div>';
+            return;
+        }
+        
+        var html = '';
+        products.forEach(function(product) {
+            var imageSrc = product.image && product.image.startsWith('data:image') ? 
+                product.image : 
+                (product.image || 'img/placeholder.jpg');
+            
+            html += `
+                <div class="item" data-name="${product.name}" data-price="${product.price}" data-category="${product.category}">
+                    <button class="wishlist-btn" onclick="toggleWishlist('${product.name}', ${product.price}, '${imageSrc}')">❤️</button>
+                    <img src="${imageSrc}" alt="${product.name}" onerror="this.src='img/placeholder.jpg'">
+                    <p class="name"><b>${product.name}</b></p>
+                    <p class="price"><b>$${product.price.toFixed(2)}</b></p>
+                    <button class="cart-button" onclick="addToCart('${product.name}', ${product.price}, '${imageSrc}')">Add to Cart</button>
+                </div>
+            `;
+        });
+        
+        row.innerHTML = html;
+    }
+
+    // ============================================================
+    // FILTER BY PRICE
+    // ============================================================
+    function filterByPrice(min, max) {
+        currentFilterMin = min;
+        currentFilterMax = max;
+        
+        var allItems = document.querySelectorAll('.item');
+        var visibleCount = 0;
+        
+        allItems.forEach(function(item) {
+            var price = parseFloat(item.getAttribute('data-price'));
+            if (!isNaN(price) && price >= min && price <= max) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        document.querySelectorAll('.filter-bar button').forEach(function(btn) {
+            btn.classList.remove('active-filter');
+        });
+        
+        showNotification('Showing ' + visibleCount + ' products in $' + min + ' - $' + max + ' range', 'info');
+    }
+
+    // ============================================================
+    // SORT PRODUCTS - Sorts within each category separately
+    // ============================================================
+    function sortProducts(order) {
+        // Get all rows
+        var necklacesRow = document.getElementById('necklacesRow');
+        var ringsRow = document.getElementById('ringsRow');
+        var earringsRow = document.getElementById('earringsRow');
+        
+        // Get all items from each category
+        var necklacesItems = necklacesRow ? Array.from(necklacesRow.querySelectorAll('.item')) : [];
+        var ringsItems = ringsRow ? Array.from(ringsRow.querySelectorAll('.item')) : [];
+        var earringsItems = earringsRow ? Array.from(earringsRow.querySelectorAll('.item')) : [];
+        
+        // Sort Necklaces by price
+        necklacesItems.sort(function(a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+            return order === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        
+        // Sort Rings by price
+        ringsItems.sort(function(a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+            return order === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        
+        // Sort Earrings by price
+        earringsItems.sort(function(a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+            return order === 'asc' ? priceA - priceB : priceB - priceA;
+        });
+        
+        // Clear all rows
+        if (necklacesRow) necklacesRow.innerHTML = '';
+        if (ringsRow) ringsRow.innerHTML = '';
+        if (earringsRow) earringsRow.innerHTML = '';
+        
+        // Re-populate rows with sorted items
+        necklacesItems.forEach(function(item) {
+            if (necklacesRow) necklacesRow.appendChild(item);
+        });
+        
+        ringsItems.forEach(function(item) {
+            if (ringsRow) ringsRow.appendChild(item);
+        });
+        
+        earringsItems.forEach(function(item) {
+            if (earringsRow) earringsRow.appendChild(item);
+        });
+        
+        // Re-apply filter after sort
+        if (currentFilterMin !== 0 || currentFilterMax !== 10000) {
+            applyFilter(currentFilterMin, currentFilterMax);
+        }
+        
+        showNotification('Sorted by price: ' + (order === 'asc' ? 'Low to High' : 'High to Low'), 'info');
+    }
+
+    // ============================================================
+    // APPLY FILTER (Helper function)
+    // ============================================================
+    function applyFilter(min, max) {
+        var allItems = document.querySelectorAll('.item');
+        allItems.forEach(function(item) {
+            var price = parseFloat(item.getAttribute('data-price'));
+            if (!isNaN(price) && price >= min && price <= max) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // ============================================================
+    // CLEAR FILTERS
+    // ============================================================
+    function clearFilters() {
+        currentFilterMin = 0;
+        currentFilterMax = 10000;
+        
+        var allItems = document.querySelectorAll('.item');
+        allItems.forEach(function(item) {
+            item.style.display = 'block';
+            item.style.border = '1px solid #2a2a2a';
+        });
+        
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchMessage').style.display = 'none';
+        
+        document.querySelectorAll('.filter-bar button').forEach(function(btn) {
+            btn.classList.remove('active-filter');
+        });
+        
+        showNotification('All filters cleared!', 'info');
+    }
+
+    // ============================================================
+    // CART FUNCTIONALITY
+    // ============================================================
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     function updateCartCount() {
-        const count = cart.reduce((total, item) => total + item.quantity, 0);
-        const cartBadge = document.getElementById('cartCount');
+        var count = cart.reduce(function(total, item) { return total + item.quantity; }, 0);
+        var cartBadge = document.getElementById('cartCount');
         if (cartBadge) cartBadge.innerText = count;
     }
 
     function addToCart(name, price, image) {
-        let existingItem = cart.find(item => item.name === name);
+        var existingItem = cart.find(function(item) { return item.name === name; });
         if (existingItem) {
             existingItem.quantity++;
         } else {
-            cart.push({ id: Date.now(), name, price, image, quantity: 1 });
+            cart.push({ id: Date.now(), name: name, price: price, image: image, quantity: 1 });
         }
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
-        showNotification(`${name} added to cart!`, 'success');
-    }
-
-    function removeFromCart(id) {
-        cart = cart.filter(item => item.id !== id);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        showNotification('Item removed from cart!', 'info');
-    }
-
-    function viewCart() {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        let cartItems = cart.map((item, index) => {
-            return `${index + 1}. ${item.name} - $${item.price} x ${item.quantity} = $${item.price * item.quantity}`;
-        }).join('\n');
-        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        let response = prompt(`🛒 YOUR CART 🛒\n\n${cartItems}\n\n📦 Total Items: ${cart.reduce((t, i) => t + i.quantity, 0)}\n💰 Total: $${total}\n\nEnter item number to remove, or type "clear" to empty cart:\n(Leave empty to close)`);
-        
-        if (response && response.toLowerCase() === 'clear') {
-            cart = [];
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            showNotification('Cart cleared!', 'info');
-            viewCart();
-        } else if (response && !isNaN(response)) {
-            let index = parseInt(response) - 1;
-            if (index >= 0 && index < cart.length) {
-                removeFromCart(cart[index].id);
-                viewCart();
-            } else {
-                alert('Invalid item number!');
-            }
-        }
+        showNotification(name + ' added to cart!', 'success');
     }
 
     function showNotification(message, type) {
-        let notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `<span>✨ ${message} ✨</span>`;
-        notification.style.background = type === 'success' ? '#27ae60' : '#d4af37';
+        type = type || 'success';
+        var notification = document.createElement('div');
+        notification.className = 'notification ' + type;
+        notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
         document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
     }
 
-    // ========== WISHLIST ==========
+    // ============================================================
+    // WISHLIST
+    // ============================================================
     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
     function toggleWishlist(name, price, image) {
-        let exists = wishlist.find(item => item.name === name);
+        var exists = wishlist.find(function(item) { return item.name === name; });
         if (exists) {
-            wishlist = wishlist.filter(item => item.name !== name);
-            showNotification(`Removed ${name} from wishlist`, 'info');
+            wishlist = wishlist.filter(function(item) { return item.name !== name; });
+            showNotification('Removed ' + name + ' from wishlist', 'info');
         } else {
-            wishlist.push({ name, price, image });
-            showNotification(`❤️ Added ${name} to wishlist`, 'success');
+            wishlist.push({ name: name, price: price, image: image });
+            showNotification('❤️ Added ' + name + ' to wishlist', 'success');
         }
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
     }
 
-    // ========== SEARCH FUNCTION ==========
+    // ============================================================
+    // SEARCH FUNCTION
+    // ============================================================
     function searchProducts() {
-        let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-        let products = document.querySelectorAll('.item');
-        let foundCount = 0;
+        var searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        var products = document.querySelectorAll('.item');
+        var foundCount = 0;
         
         if (searchTerm === '') { clearSearch(); return; }
         
-        products.forEach(product => {
-            let title = product.querySelector('.name')?.innerText.toLowerCase() || '';
+        products.forEach(function(product) {
+            var title = product.querySelector('.name')?.innerText.toLowerCase() || '';
             if (title.includes(searchTerm)) {
                 product.style.display = 'block';
                 product.style.border = '2px solid #d4af37';
@@ -724,84 +824,79 @@
             }
         });
         
-        let msgDiv = document.getElementById('searchMessage');
+        var msgDiv = document.getElementById('searchMessage');
         msgDiv.style.display = 'block';
         msgDiv.innerHTML = foundCount > 0 ? 
-            `🔍 Found ${foundCount} product(s) matching "${searchTerm}" <button class="clear-search" onclick="clearSearch()">Clear</button>` :
-            `❌ No products found matching "${searchTerm}" <button class="clear-search" onclick="clearSearch()">Clear</button>`;
+            '🔍 Found ' + foundCount + ' product(s) matching "' + searchTerm + '" <button class="clear-search" onclick="clearSearch()">Clear</button>' :
+            '❌ No products found matching "' + searchTerm + '" <button class="clear-search" onclick="clearSearch()">Clear</button>';
     }
 
     function clearSearch() {
-        let products = document.querySelectorAll('.item');
-        products.forEach(product => {
+        var products = document.querySelectorAll('.item');
+        products.forEach(function(product) {
             product.style.display = 'block';
             product.style.border = '1px solid #2a2a2a';
         });
         document.getElementById('searchMessage').style.display = 'none';
         document.getElementById('searchInput').value = '';
+        if (currentFilterMin !== 0 || currentFilterMax !== 10000) {
+            applyFilter(currentFilterMin, currentFilterMax);
+        }
     }
 
-    // ========== FILTER & SORT ==========
-    function filterByPrice(min, max) {
-        let products = document.querySelectorAll('.item');
-        let visibleCount = 0;
-        products.forEach(product => {
-            let price = parseFloat(product.getAttribute('data-price'));
-            if (price >= min && price <= max) {
-                product.style.display = 'block';
-                visibleCount++;
-            } else {
-                product.style.display = 'none';
-            }
-        });
-        showNotification(`Showing ${visibleCount} products in $${min} - $${max} range`, 'info');
-    }
-
-    function sortProducts(order) {
-        let allProducts = Array.from(document.querySelectorAll('.item'));
-        let containers = document.querySelectorAll('.row');
-        
-        containers.forEach(container => container.innerHTML = '');
-        
-        allProducts.sort((a, b) => {
-            let priceA = parseFloat(a.getAttribute('data-price'));
-            let priceB = parseFloat(b.getAttribute('data-price'));
-            return order === 'asc' ? priceA - priceB : priceB - priceA;
-        });
-        
-        allProducts.forEach((product, index) => {
-            let rowIndex = Math.floor(index / 4);
-            if (containers[rowIndex]) {
-                containers[rowIndex].appendChild(product);
-            }
-        });
-        
-        showNotification(`Sorted by price: ${order === 'asc' ? 'Low to High' : 'High to Low'}`, 'info');
-    }
-
-    function clearFilters() {
-        let products = document.querySelectorAll('.item');
-        products.forEach(product => product.style.display = 'block');
-        document.getElementById('searchInput').value = '';
-        document.getElementById('searchMessage').style.display = 'none';
-        showNotification('All filters cleared!', 'info');
-    }
-
-    // ========== SCROLL TO TOP ==========
+    // ============================================================
+    // SCROLL TO TOP
+    // ============================================================
     function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    window.addEventListener('scroll', () => {
-        let btn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', function() {
+        var btn = document.getElementById('scrollTopBtn');
         if (window.scrollY > 300) btn.style.display = 'block';
         else btn.style.display = 'none';
     });
 
-    // ========== DROPDOWN MENU ==========
-    document.addEventListener('DOMContentLoaded', function() {
-        updateCartCount();
+    // ============================================================
+    // UPDATE AUTH LINK (Login/Logout)
+    // ============================================================
+    function updateAuthLink() {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        var authLink = document.getElementById('authLink');
+        var authText = document.getElementById('authText');
         
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-        dropdownToggles.forEach(toggle => {
+        if (authLink && authText) {
+            if (currentUser) {
+                authText.textContent = 'Logout';
+                authLink.href = '#';
+                authLink.style.color = '#e74c3c';
+                authLink.onclick = function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.removeItem('currentUser');
+                        showNotification('Logged out successfully! 👋', 'info');
+                        setTimeout(function() {
+                            window.location.href = 'login.html';
+                        }, 1000);
+                    }
+                };
+            } else {
+                authText.textContent = 'Login';
+                authLink.href = 'login.html';
+                authLink.style.color = '#d4af37';
+                authLink.onclick = null;
+            }
+        }
+    }
+
+    // ============================================================
+    // DROPDOWN MENU
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProducts();
+        updateCartCount();
+        updateAuthLink();
+        
+        var dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -810,14 +905,17 @@
         });
         
         document.addEventListener('click', function(e) {
-            document.querySelectorAll('.dropdown.open').forEach(drop => {
+            document.querySelectorAll('.dropdown.open').forEach(function(drop) {
                 if (!drop.contains(e.target)) drop.classList.remove('open');
             });
         });
         
-        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchProducts();
-        });
+        var searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchProducts();
+            });
+        }
     });
 </script>
 </body>

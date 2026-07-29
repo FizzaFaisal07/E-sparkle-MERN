@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Sparkle | Login & Signup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: #0a0a0a;
+            /* Background Image */
+            background-image: url('img/b.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        /* Dark overlay for better readability */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        .auth-container {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-container .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-container .logo img {
+            max-width: 200px;
+            width: 80%;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+        }
+
+        .auth-container h1 {
+            color: #d4af37;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .auth-container p.subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(26, 26, 26, 0.9);
+            border: 2px solid #2a2a2a;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .form-group .input-with-icon {
+            position: relative;
+        }
+
+        .form-group .input-with-icon input {
+            padding-right: 45px;
+        }
+
+        .form-group .input-with-icon i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 0.75rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #888;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 2;
+        }
+
+        .password-toggle:hover {
+            color: #d4af37;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .form-options label {
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-options label input[type="checkbox"] {
+            accent-color: #d4af37;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .form-options a {
+            color: #d4af37;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .form-options a:hover {
+            color: #f0c45a;
+            text-decoration: underline;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #d4af37;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #f0c45a;
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .auth-footer a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            color: #f0c45a;
+            text-decoration: underline;
+        }
+
+        .social-login {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .social-login p {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .social-login p::before,
+        .social-login p::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #2a2a2a;
+        }
+
+        .social-login p::before {
+            left: 0;
+        }
+
+        .social-login p::after {
+            right: 0;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-icons a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .social-icons a:hover {
+            border-color: #d4af37;
+            transform: translateY(-2px);
+        }
+
+        .social-icons a.google:hover { background: #db4437; }
+        .social-icons a.facebook:hover { background: #4267B2; }
+        .social-icons a.github:hover { background: #333; }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9999;
+            animation: slideDown 0.3s ease;
+            max-width: 350px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .notification.info {
+            background: #d4af37;
+            color: #0a0a0a;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Toggle Switch for Role */
+        .role-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .role-toggle .role-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .role-toggle .role-btn.active {
+            background: #d4af37;
+            color: #0a0a0a;
+        }
+
+        .role-toggle .role-btn:hover:not(.active) {
+            color: #fff;
+        }
+
+        .role-toggle .role-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* Password Strength */
+        .password-strength {
+            margin-top: 5px;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .password-strength .strength-bar {
+            height: 4px;
+            border-radius: 4px;
+            background: #2a2a2a;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .password-strength .strength-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: 0.3s;
+            width: 0%;
+        }
+
+        .password-strength .strength-text {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 3px;
+            display: block;
+        }
+
+        .password-strength .strength-text.weak { color: #e74c3c; }
+        .password-strength .strength-text.medium { color: #f39c12; }
+        .password-strength .strength-text.strong { color: #27ae60; }
+
+        /* Terms checkbox */
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            accent-color: #d4af37;
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .terms-checkbox label {
+            color: #888;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .terms-checkbox label a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .terms-checkbox label a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .auth-container {
+                padding: 2rem 1.5rem;
+                margin: 0.5rem;
+                border-radius: 15px;
+            }
+
+            .auth-container h1 {
+                font-size: 1.5rem;
+            }
+
+            .role-toggle .role-btn {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+
+            .role-toggle .role-btn i {
+                font-size: 0.8rem;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .social-icons a {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                font-size: 0.8rem;
+                padding: 12px 16px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .auth-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .auth-container .logo img {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container" id="authContainer">
+        <div class="logo">
+            <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/200x80?text=E-SPARKLE'">
+        </div>
+
+        <!-- ===== LOGIN FORM ===== -->
+        <div id="loginForm">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Login to your E-Sparkle account</p>
+
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+                <div class="error-text" id="loginEmailError">Please enter a valid email</div>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <div class="input-with-icon">
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+                </div>
+                <div class="error-text" id="loginPasswordError">Password is required</div>
+            </div>
+
+            <div class="form-options">
+                <label>
+                    <input type="checkbox" id="rememberMe"> Remember Me
+                </label>
+                <a href="#" onclick="showNotification('Password reset link sent to your email!', 'info')">Forgot Password?</a>
+            </div>
+
+            <button class="btn-primary" onclick="handleLogin()">Login</button>
+
+            <div class="auth-footer">
+                Don't have an account? <a onclick="showSignup()">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- ===== SIGNUP FORM ===== -->
+        <div id="signupForm" style="display: none;">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join the E-Sparkle family ✨</p>
+
+            <!-- Role Selection -->
+            <div class="form-group">
+                <label>I want to sign up as</label>
+                <div class="role-toggle">
+                    <button class="role-btn active" onclick="selectRole('customer', this)">
+                        <i class="fas fa-user"></i> Customer
+                    </button>
+                    <button class="role-btn" onclick="selectRole('admin', this)">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                </div>
+                <input type="hidden" id="signupRole" value="customer">
+            </div>
+
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" placeholder="Enter your full name">
+                <div class="error-text" id="signupNameError">Name is required</div>
+            </div>
+
+            <div class="form-group">
+                <label for="signupEmail">Email Address</label>
+                <input type="email" id="signupEmail" placeholder="Enter your email">
+                <div class="error-text" id="signupEmailError">Please enter a valid email</div>
+            </div>
+
+            <div class="form-group">
+                <label for="signupPhone">Phone Number (optional)</label>
+                <input type="tel" id="signupPhone" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <div class="input-with-icon">
+                    <input type="password" id="signupPassword" placeholder="Create a password (min 6 chars)" oninput="checkPasswordStrength(this.value)">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('signupPassword', this)"></i>
+                </div>
+                <div class="error-text" id="signupPasswordError">Password must be at least 6 characters</div>
+                
+                <!-- Password Strength -->
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="fill" id="strengthFill"></div>
+                    </div>
+                    <span class="strength-text" id="strengthText">Enter a password</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="signupConfirm">Confirm Password</label>
+                <div class="input-with-icon">
+                    <input type="password" id="signupConfirm" placeholder="Confirm your password">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('signupConfirm', this)"></i>
+                </div>
+                <div class="error-text" id="signupConfirmError">Passwords do not match</div>
+            </div>
+
+            <div class="terms-checkbox">
+                <input type="checkbox" id="agreeTerms">
+                <label for="agreeTerms">
+                    I agree to the <a href="#" onclick="showNotification('Terms and Conditions coming soon!', 'info')">Terms of Service</a> and 
+                    <a href="#" onclick="showNotification('Privacy Policy coming soon!', 'info')">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button class="btn-primary" onclick="handleSignup()">Create Account</button>
+
+            <div class="auth-footer">
+                Already have an account? <a onclick="showLogin()">Login</a>
+            </div>
+        </div>
+
+        <!-- Social Login -->
+        <div class="social-login">
+            <p>Or continue with</p>
+            <div class="social-icons">
+                <a href="#" class="google" onclick="showNotification('Google login coming soon!', 'info')"><i class="fab fa-google"></i></a>
+                <a href="#" class="facebook" onclick="showNotification('Facebook login coming soon!', 'info')"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="github" onclick="showNotification('GitHub login coming soon!', 'info')"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // USER MANAGEMENT
+        // ============================================================
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let selectedRole = 'customer';
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        // Create default admin if none exists
+        if (!users.find(function(u) { return u.role === 'admin'; })) {
+            users.push({
+                id: Date.now(),
+                name: 'Admin',
+                email: 'admin@esparkle.com',
+                password: 'admin123',
+                phone: '',
+                role: 'admin',
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // ============================================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ============================================================
+        function togglePassword(inputId, icon) {
+            var input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ============================================================
+        // ROLE SELECTION
+        // ============================================================
+        function selectRole(role, element) {
+            selectedRole = role;
+            document.querySelectorAll('.role-btn').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            element.classList.add('active');
+            document.getElementById('signupRole').value = role;
+        }
+
+        // ============================================================
+        // SHOW/HIDE FORMS
+        // ============================================================
+        function showSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            clearErrors();
+            selectedRole = 'customer';
+            document.querySelectorAll('.role-btn').forEach(function(el) {
+                el.classList.remove('active');
+                if (el.textContent.trim().toLowerCase().includes('customer')) {
+                    el.classList.add('active');
+                }
+            });
+            document.getElementById('signupRole').value = 'customer';
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+            clearErrors();
+        }
+
+        // ============================================================
+        // CLEAR ERRORS
+        // ============================================================
+        function clearErrors() {
+            document.querySelectorAll('.error-text').forEach(function(el) {
+                el.classList.remove('show');
+            });
+            document.querySelectorAll('.form-group input').forEach(function(el) {
+                el.classList.remove('error');
+            });
+        }
+
+        // ============================================================
+        // SHOW ERROR
+        // ============================================================
+        function showError(inputId, errorId) {
+            document.getElementById(inputId).classList.add('error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        // ============================================================
+        // VALIDATE EMAIL
+        // ============================================================
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // ============================================================
+        // PASSWORD STRENGTH
+        // ============================================================
+        function checkPasswordStrength(password) {
+            var strengthDiv = document.getElementById('passwordStrength');
+            var fill = document.getElementById('strengthFill');
+            var text = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                strengthDiv.classList.remove('show');
+                return;
+            }
+            
+            strengthDiv.classList.add('show');
+            
+            var strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            var percentage = (strength / 5) * 100;
+            fill.style.width = percentage + '%';
+            
+            var strengthText = '';
+            var strengthClass = '';
+            if (strength <= 1) {
+                strengthText = 'Weak - Add more characters, numbers, and symbols';
+                strengthClass = 'weak';
+                fill.style.background = '#e74c3c';
+            } else if (strength <= 3) {
+                strengthText = 'Medium - Add uppercase letters and symbols for stronger password';
+                strengthClass = 'medium';
+                fill.style.background = '#f39c12';
+            } else {
+                strengthText = 'Strong - Great password!';
+                strengthClass = 'strong';
+                fill.style.background = '#27ae60';
+            }
+            
+            text.textContent = strengthText;
+            text.className = 'strength-text ' + strengthClass;
+        }
+
+        // ============================================================
+        // SHOW NOTIFICATION
+        // ============================================================
+        function showNotification(message, type) {
+            type = type || 'success';
+            var notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(function() {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ============================================================
+        // HANDLE LOGIN
+        // ============================================================
+        function handleLogin() {
+            clearErrors();
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value.trim();
+            var isValid = true;
+
+            if (!email || !isValidEmail(email)) {
+                showError('loginEmail', 'loginEmailError');
+                isValid = false;
+            }
+
+            if (!password || password.length < 6) {
+                showError('loginPassword', 'loginPasswordError');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            var user = null;
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].email === email && users[i].password === password) {
+                    user = users[i];
+                    break;
+                }
+            }
+
+            if (!user) {
+                showNotification('Invalid email or password!', 'error');
+                return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            showNotification('Welcome back, ' + user.name + '! 🎉', 'success');
+
+            setTimeout(function() {
+                if (user.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+
+        // ============================================================
+        // HANDLE SIGNUP
+        // ============================================================
+        function handleSignup() {
+            clearErrors();
+            
+            var name = document.getElementById('signupName').value.trim();
+            var email = document.getElementById('signupEmail').value.trim();
+            var phone = document.getElementById('signupPhone').value.trim();
+            var password = document.getElementById('signupPassword').value.trim();
+            var confirm = document.getElementById('signupConfirm').value.trim();
+            var role = document.getElementById('signupRole').value;
+            var agree = document.getElementById('agreeTerms').checked;
+            
+            var isValid = true;
+
+            if (!name || name.length < 2) {
+                showError('signupName', 'signupNameError');
+                isValid = false;
+            }
+
+            if (!email || !isValidEmail(email)) {
+                showError('signupEmail', 'signupEmailError');
+                isValid = false;
+            }
+
+            if (!password || password.length < 6) {
+                showError('signupPassword', 'signupPasswordError');
+                isValid = false;
+            }
+
+            if (password !== confirm) {
+                showError('signupConfirm', 'signupConfirmError');
+                isValid = false;
+            }
+
+            if (!agree) {
+                showNotification('Please agree to the Terms of Service and Privacy Policy', 'error');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            var userExists = false;
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].email === email) {
+                    userExists = true;
+                    break;
+                }
+            }
+            
+            if (userExists) {
+                showNotification('User with this email already exists!', 'error');
+                return;
+            }
+
+            var newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                phone: phone || '',
+                password: password,
+                role: role,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            var roleText = role === 'admin' ? 'Admin' : 'Customer';
+            showNotification('Account created successfully! Welcome ' + name + '! 🎉', 'success');
+
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            setTimeout(function() {
+                if (newUser.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1500);
+        }
+
+        // ============================================================
+        // ENTER KEY SUPPORT
+        // ============================================================
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                var loginForm = document.getElementById('loginForm');
+                if (loginForm.style.display !== 'none') {
+                    handleLogin();
+                } else {
+                    handleSignup();
+                }
+            }
+        });
+
+        // ============================================================
+        // CHECK IF ALREADY LOGGED IN
+        // ============================================================
+        if (currentUser) {
+            showNotification('Welcome back, ' + currentUser.name + '!', 'success');
+            setTimeout(function() {
+                if (currentUser.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+
+        // ============================================================
+        // PREVENT FORM SUBMISSION ON ENTER IN INPUT FIELDS
+        // ============================================================
+        document.querySelectorAll('input').forEach(function(input) {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

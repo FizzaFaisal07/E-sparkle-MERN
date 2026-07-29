@@ -342,13 +342,18 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: #27ae60;
-        color: white;
         padding: 12px 20px;
         border-radius: 10px;
+        color: white;
         z-index: 9999;
         animation: slideIn 0.3s ease;
+        font-size: 0.85rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
     }
+    .notification.success { background: #27ae60; }
+    .notification.error { background: #e74c3c; }
+    .notification.info { background: #d4af37; color: #0a0a0a; }
+
     @keyframes slideIn {
         from { transform: translateX(100%); opacity: 0; }
         to { transform: translateX(0); opacity: 1; }
@@ -408,10 +413,11 @@
                 </ul>
             </li>
             <li><b><a href="contact1.html">Contact</a></b></li>
-            <li><b><a href="sale.html" style="color:#ffffff;">Sale </a></b></li>
-<li style="position: relative;">
-    <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
-</li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+            <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+            <li style="position: relative;">
+                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+            </li>
             <li class="search-li">
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Search sale...">
@@ -661,12 +667,14 @@
     }
 
     function showNotification(message, type) {
-        let notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `<span>✨ ${message} ✨</span>`;
-        notification.style.background = type === 'success' ? '#27ae60' : '#d4af37';
+        type = type || 'success';
+        var notification = document.createElement('div');
+        notification.className = 'notification ' + type;
+        notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
         document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
     }
 
     // ========== WISHLIST ==========
@@ -765,9 +773,45 @@
         else btn.style.display = 'none';
     });
 
+    // ============================================================
+    // UPDATE AUTH LINK (Login/Logout)
+    // ============================================================
+    function updateAuthLink() {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        var authLink = document.getElementById('authLink');
+        var authText = document.getElementById('authText');
+        
+        if (authLink && authText) {
+            if (currentUser) {
+                // User is logged in - Show Logout
+                authText.textContent = 'Logout';
+                authLink.href = '#';
+                authLink.style.color = '#e74c3c';
+                authLink.onclick = function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.removeItem('currentUser');
+                        showNotification('Logged out successfully! 👋', 'info');
+                        // Redirect to login page
+                        setTimeout(function() {
+                            window.location.href = 'login.html';
+                        }, 1000);
+                    }
+                };
+            } else {
+                // User is logged out - Show Login
+                authText.textContent = 'Login';
+                authLink.href = 'login.html';
+                authLink.style.color = '#d4af37';
+                authLink.onclick = null;
+            }
+        }
+    }
+
     // ========== DROPDOWN MENU ==========
     document.addEventListener('DOMContentLoaded', function() {
         updateCartCount();
+        updateAuthLink();
         
         const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
         dropdownToggles.forEach(toggle => {

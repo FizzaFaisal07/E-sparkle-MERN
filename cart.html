@@ -64,6 +64,10 @@
             font-size: 1rem;
             margin-top: 1rem;
         }
+        .checkout:hover {
+            background: #219a52;
+            transform: scale(1.02);
+        }
         .back-btn {
             background: #d4af37;
             color: #0a0a0a;
@@ -72,96 +76,310 @@
             border-radius: 25px;
             margin-right: 1rem;
             display: inline-block;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0c45a;
+            transform: scale(1.02);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #d4af37; color: #0a0a0a; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .navbar {
+            background: #0f0f0f;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 2rem;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2rem;
+        }
+        nav ul li a {
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        nav ul li a:hover { color: #d4af37; }
+        .cart-badge {
+            background: #e67e22;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            position: absolute;
+            top: -8px;
+            right: -12px;
+        }
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 150%;
+            left: 0;
+            background: #1a1a1a;
+            min-width: 140px;
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            display: none;
+            border: 1px solid #d4af37;
+        }
+        .dropdown.open .dropdown-menu { display: block; }
+        .dropdown-menu li { display: block; margin: 0; }
+        .dropdown-menu li a {
+            display: block;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+        }
+        .dropdown-menu li a:hover { background: #2a2a2a; }
+        .dropdown-toggle::after {
+            content: "▼";
+            font-size: 0.6rem;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+        }
+        .empty-cart a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .empty-cart a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .cart-container { padding: 1rem; }
+            nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+            th, td { padding: 0.5rem; font-size: 0.85rem; }
+            .total { font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            th, td { padding: 0.3rem; font-size: 0.75rem; }
+            .quantity-btn { padding: 3px 6px; font-size: 0.7rem; }
+            .remove-btn { padding: 3px 8px; font-size: 0.7rem; }
+            .back-btn { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
-    <div class="cart-container">
-        <h1 style="color:#d4af37;">🛒 Your Cart</h1>
-        <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
-        <div id="cartContent"></div>
-    </div>
-    
 
-    <script>
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b>Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+            <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+            <li style="position: relative;">
+                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+            </li>
+        </ul>
+    </nav>
+</div>
 
-        function displayCart() {
-            let container = document.getElementById('cartContent');
-            if (cart.length === 0) {
-                container.innerHTML = '<p style="text-align:center; padding:3rem;">Your cart is empty. <a href="html 1.htm">Start Shopping →</a></p>';
-                return;
-            }
+<div class="cart-container">
+    <h1 style="color:#d4af37;">🛒 Your Cart</h1>
+    <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+    <div id="cartContent"></div>
+</div>
 
-            let html = `
-                <table>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
-                        <th>Action</th>
-                    </tr>
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function displayCart() {
+        let container = document.getElementById('cartContent');
+        if (cart.length === 0) {
+            container.innerHTML = '<div class="empty-cart"><p>Your cart is empty. <a href="html 1.htm">Start Shopping →</a></p></div>';
+            return;
+        }
+
+        let html = `
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+        `;
+        let total = 0;
+        cart.forEach(item => {
+            let subtotal = item.price * item.quantity;
+            total += subtotal;
+            html += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>$${item.price}</td>
+                    <td>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        ${item.quantity}
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </td>
+                    <td>$${subtotal}</td>
+                    <td><button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button></td>
+                </tr>
             `;
-            let total = 0;
-            cart.forEach(item => {
-                let subtotal = item.price * item.quantity;
-                total += subtotal;
-                html += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>$${item.price}</td>
-                        <td>
-                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                            ${item.quantity}
-                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                        </td>
-                        <td>$${subtotal}</td>
-                        <td><button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button></td>
-                    </tr>
-                `;
-            });
-            html += `</table><div class="total">Total: $${total}</div>`;
-            html += `<button class="checkout" onclick="checkout()">Proceed to Checkout →</button>`;
-            container.innerHTML = html;
-        }
+        });
+        html += `</table><div class="total">Total: $${total}</div>`;
+        html += `<button class="checkout" onclick="checkout()">Proceed to Checkout →</button>`;
+        container.innerHTML = html;
+    }
 
-        function updateQuantity(id, change) {
-            let item = cart.find(i => i.id === id);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity < 1) {
-                    removeFromCart(id);
-                } else {
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    displayCart();
-                    updateCartCount();
-                }
+    function updateQuantity(id, change) {
+        let item = cart.find(i => i.id === id);
+        if (item) {
+            item.quantity += change;
+            if (item.quantity < 1) {
+                removeFromCart(id);
+            } else {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                displayCart();
+                updateCartCount();
             }
         }
+    }
 
-        function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            displayCart();
-            updateCartCount();
-        }
-
-        function checkout() {
-            alert('Thank you for shopping! Total: $' + cart.reduce((s, i) => s + (i.price * i.quantity), 0));
-            cart = [];
-            localStorage.setItem('cart', JSON.stringify(cart));
-            displayCart();
-            updateCartCount();
-        }
-
-        function updateCartCount() {
-            let count = cart.reduce((s, i) => s + i.quantity, 0);
-            let badge = document.getElementById('cartCount');
-            if (badge) badge.innerText = count;
-        }
-
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        localStorage.setItem('cart', JSON.stringify(cart));
         displayCart();
-    </script>
+        updateCartCount();
+        showNotification('Item removed from cart!', 'info');
+    }
+
+    function checkout() {
+        let total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+        alert('Thank you for shopping! Total: $' + total);
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCart();
+        updateCartCount();
+        showNotification('Order placed successfully! 🎉', 'success');
+    }
+
+    function updateCartCount() {
+        let count = cart.reduce((s, i) => s + i.quantity, 0);
+        let badge = document.getElementById('cartCount');
+        if (badge) badge.innerText = count;
+    }
+
+    // ============================================================
+    // SHOW NOTIFICATION
+    // ============================================================
+    function showNotification(message, type) {
+        type = type || 'success';
+        var notification = document.createElement('div');
+        notification.className = 'notification ' + type;
+        notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
+        document.body.appendChild(notification);
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
+    }
+
+    // ============================================================
+    // UPDATE AUTH LINK (Login/Logout)
+    // ============================================================
+    function updateAuthLink() {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        var authLink = document.getElementById('authLink');
+        var authText = document.getElementById('authText');
+        
+        if (authLink && authText) {
+            if (currentUser) {
+                // User is logged in - Show Logout
+                authText.textContent = 'Logout';
+                authLink.href = '#';
+                authLink.style.color = '#e74c3c';
+                authLink.onclick = function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.removeItem('currentUser');
+                        showNotification('Logged out successfully! 👋', 'info');
+                        // Redirect to login page
+                        setTimeout(function() {
+                            window.location.href = 'login.html';
+                        }, 1000);
+                    }
+                };
+            } else {
+                // User is logged out - Show Login
+                authText.textContent = 'Login';
+                authLink.href = 'login.html';
+                authLink.style.color = '#d4af37';
+                authLink.onclick = null;
+            }
+        }
+    }
+
+    // ============================================================
+    // DROPDOWN MENU
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        displayCart();
+        updateCartCount();
+        updateAuthLink();
+        
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closest('.dropdown').classList.toggle('open');
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown.open').forEach(drop => {
+                if (!drop.contains(e.target)) drop.classList.remove('open');
+            });
+        });
+    });
+</script>
 </body>
 </html>

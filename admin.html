@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Sparkle | Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== ADMIN HEADER ===== */
+        .admin-header {
+            background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid #d4af37;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header .logo img {
+            max-height: 50px;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+        }
+
+        .admin-header .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .admin-info span {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .admin-header .admin-info .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .admin-header .admin-info .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* ===== ADMIN DASHBOARD LAYOUT ===== */
+        .admin-dashboard {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: 240px;
+            background: #141414;
+            border-right: 1px solid #2a2a2a;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+        }
+
+        .admin-sidebar .menu-item {
+            padding: 12px 24px;
+            color: #bbb;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .admin-sidebar .menu-item:hover {
+            background: #1a1a1a;
+            color: #d4af37;
+        }
+
+        .admin-sidebar .menu-item.active {
+            color: #d4af37;
+            border-left-color: #d4af37;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .admin-sidebar .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .admin-sidebar .menu-item .badge {
+            background: #e74c3c;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            background: #0a0a0a;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #141414;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid #2a2a2a;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+        }
+
+        .stat-card h3 {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            color: #d4af37;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card .icon {
+            font-size: 1.5rem;
+            color: #d4af37;
+            opacity: 0.5;
+        }
+
+        /* ===== TABLE CONTAINER ===== */
+        .table-container {
+            background: #141414;
+            border-radius: 15px;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2a2a;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header h2 {
+            color: #d4af37;
+            font-size: 1.2rem;
+        }
+
+        .table-header .search-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-header .search-box input {
+            padding: 8px 15px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 25px;
+            color: #fff;
+            outline: none;
+            min-width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .table-header .search-box input:focus {
+            border-color: #d4af37;
+        }
+
+        .table-header .search-box input::placeholder {
+            color: #666;
+        }
+
+        .table-header .search-box button {
+            background: #d4af37;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            color: #0a0a0a;
+        }
+
+        .table-header .search-box button:hover {
+            background: #f0c45a;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        th {
+            color: #d4af37;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #0f0f0f;
+        }
+
+        td {
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        tr:hover td {
+            background: rgba(212, 175, 55, 0.03);
+        }
+
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+            vertical-align: middle;
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-badge.inactive {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-btn {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 5px;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .action-btn:hover {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .action-btn.delete:hover {
+            color: #e74c3c;
+        }
+
+        .action-btn.add-btn {
+            background: #d4af37;
+            color: #0a0a0a;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .action-btn.add-btn:hover {
+            background: #f0c45a;
+            color: #0a0a0a;
+        }
+
+        /* ===== SECTION VISIBILITY ===== */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            color: #d4af37;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .modal .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .modal .form-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            border-color: #d4af37;
+        }
+
+        .modal .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Image Upload Preview */
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .image-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            border: 2px dashed #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #0a0a0a;
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview .placeholder {
+            color: #666;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        .image-preview .placeholder i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .image-upload-btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .image-upload-btn:hover {
+            background: #d4af37;
+            color: #0a0a0a;
+        }
+
+        .image-upload-input {
+            display: none;
+        }
+
+        .modal .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal .form-actions button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .modal .form-actions .btn-save {
+            background: #d4af37;
+            color: #0a0a0a;
+        }
+
+        .modal .form-actions .btn-save:hover {
+            background: #f0c45a;
+        }
+
+        .modal .form-actions .btn-cancel {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .modal .form-actions .btn-cancel:hover {
+            background: #3a3a3a;
+        }
+
+        /* ===== SETTINGS FORM ===== */
+        .settings-form .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .settings-form .form-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .settings-form .form-group input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 12px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .settings-form .form-group input:focus {
+            border-color: #d4af37;
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .settings-section h3 {
+            color: #888;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .settings-btn {
+            background: #d4af37;
+            color: #0a0a0a;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .settings-btn:hover {
+            background: #f0c45a;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-size: 0.95rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .notification.success { 
+            background: #27ae60; 
+        }
+        .notification.error { 
+            background: #e74c3c; 
+        }
+        .notification.info { 
+            background: #d4af37; 
+            color: #0a0a0a; 
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+        }
+
+        /* ===== SYNC BUTTON ===== */
+        .sync-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .sync-btn:hover {
+            background: #1976D2;
+            transform: scale(1.02);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .admin-main {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-dashboard {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #2a2a2a;
+                display: flex;
+                overflow-x: auto;
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .admin-sidebar .menu-item {
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+
+            .admin-sidebar .menu-item.active {
+                border-left: none;
+                border-bottom-color: #d4af37;
+            }
+
+            .admin-sidebar .menu-item .badge {
+                display: none;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .stat-card .number {
+                font-size: 2rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+
+            .table-header .search-box {
+                width: 100%;
+            }
+
+            .table-header .search-box input {
+                flex: 1;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .table-header .search-box button {
+                padding: 8px 15px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .admin-header .admin-info {
+                justify-content: center;
+            }
+
+            .modal {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .settings-form .form-group input {
+                max-width: 100%;
+            }
+
+            .image-upload-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-card .number {
+                font-size: 1.8rem;
+            }
+
+            .admin-sidebar .menu-item {
+                padding: 8px 12px;
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+            }
+
+            .modal .form-actions {
+                flex-direction: column;
+            }
+
+            .modal .form-actions button {
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ADMIN HEADER ===== -->
+    <header class="admin-header">
+        <div class="logo">
+            <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/200x60?text=E-SPARKLE'">
+        </div>
+        <div class="admin-info">
+            <span><i class="fas fa-user-shield"></i> Admin Panel</span>
+           
+            <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </header>
+
+    <!-- ===== ADMIN DASHBOARD ===== -->
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="menu-item active" onclick="showSection('dashboard', this)">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </div>
+            <div class="menu-item" onclick="showSection('products', this)">
+                <i class="fas fa-gem"></i> Products
+                <span class="badge" id="productCount">0</span>
+            </div>
+            <div class="menu-item" onclick="showSection('users', this)">
+                <i class="fas fa-users"></i> Users
+                <span class="badge" id="userCount">0</span>
+            </div>
+            <div class="menu-item" onclick="showSection('orders', this)">
+                <i class="fas fa-shopping-cart"></i> Orders
+                <span class="badge" id="orderCount">0</span>
+            </div>
+            <div class="menu-item" onclick="showSection('settings', this)">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+        </nav>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="admin-main">
+            <!-- ===== DASHBOARD SECTION ===== -->
+            <section id="section-dashboard" class="section active">
+                <h1 style="color: #d4af37; margin-bottom: 0.5rem; font-size: 2rem;">Dashboard</h1>
+                <p style="color: #888; margin-bottom: 2rem;">Welcome to E-Sparkle Admin Panel</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-gem"></i></div>
+                        <h3>Total Products</h3>
+                        <div class="number" id="statProducts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <h3>Total Users</h3>
+                        <div class="number" id="statUsers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                        <h3>Total Orders</h3>
+                        <div class="number" id="statOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                        <h3>Revenue</h3>
+                        <div class="number" id="statRevenue">$0</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Recent Orders</h2>
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-box"></i>
+                        <p>No orders yet</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PRODUCTS SECTION ===== -->
+            <section id="section-products" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2><i class="fas fa-gem"></i> Products</h2>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <input type="text" id="productSearch" placeholder="Search products...">
+                                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                            </div>
+                            <button class="action-btn add-btn" onclick="openAddProductModal()">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                            <button class="sync-btn" onclick="syncProductsToStore()">
+                                <i class="fas fa-sync"></i> Sync to Store
+                            </button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-box-open"></i>
+                                    <p>No products added yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===== USERS SECTION ===== -->
+            <section id="section-users" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2><i class="fas fa-users"></i> Users</h2>
+                        <div class="search-box">
+                            <input type="text" id="userSearch" placeholder="Search users...">
+                            <button onclick="searchUsers()"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <i class="fas fa-users"></i>
+                                    <p>No users found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===== ORDERS SECTION ===== -->
+            <section id="section-orders" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2><i class="fas fa-shopping-cart"></i> Orders</h2>
+                        <div class="search-box">
+                            <input type="text" id="orderSearch" placeholder="Search orders...">
+                            <button onclick="searchOrders()"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-box"></i>
+                                    <p>No orders yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===== SETTINGS SECTION ===== -->
+            <section id="section-settings" class="section">
+                <div class="table-container" style="padding: 2rem;">
+                    <h2 style="color: #d4af37; margin-bottom: 1.5rem;"><i class="fas fa-cog"></i> Settings</h2>
+                    
+                    <div class="settings-section">
+                        <h3>Store Information</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Store Name</label>
+                                <input type="text" id="storeName" value="E-Sparkle Jewelry">
+                            </div>
+                            <div class="form-group">
+                                <label>Store Email</label>
+                                <input type="email" id="storeEmail" value="E-sparkle2009@gmail.com">
+                            </div>
+                            <button class="settings-btn" onclick="saveSettings()">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Admin Account</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Admin Name</label>
+                                <input type="text" id="adminNameInput">
+                            </div>
+                            <div class="form-group">
+                                <label>New Password (leave blank to keep current)</label>
+                                <input type="password" id="adminPasswordInput" placeholder="Enter new password">
+                            </div>
+                            <button class="settings-btn" onclick="updateAdminProfile()">
+                                <i class="fas fa-user-edit"></i> Update Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Product Sync</h3>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 1rem;">
+                            Click the button below to sync all products to the customer store.
+                        </p>
+                        <button class="settings-btn" onclick="syncProductsToStore()" style="background: #2196F3; color: white;">
+                            <i class="fas fa-sync"></i> Sync Products to Store
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== PRODUCT MODAL ===== -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal">
+            <h2 id="productModalTitle">Add Product</h2>
+            <input type="hidden" id="editProductId" value="">
+            
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="productName" placeholder="Enter product name">
+            </div>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" id="productPrice" placeholder="Enter price" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="productCategory">
+                    <option value="Necklaces">Necklaces</option>
+                    <option value="Rings">Rings</option>
+                    <option value="Earrings">Earrings</option>
+                    <option value="Bangles">Bangles</option>
+                    <option value="Watches">Watches</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Product Image</label>
+                <div class="image-upload-container">
+                    <div class="image-preview" id="imagePreview">
+                        <div class="placeholder">
+                            <i class="fas fa-image"></i>
+                            <span>No image</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="image-upload-btn" onclick="document.getElementById('imageUpload').click()">
+                            <i class="fas fa-upload"></i> Choose Image
+                        </button>
+                        <input type="file" id="imageUpload" class="image-upload-input" accept="image/*" onchange="handleImageUpload(event)">
+                        <button class="image-upload-btn" onclick="removeImage()" style="background: #e74c3c; margin-left: 5px;">
+                            <i class="fas fa-times"></i> Remove
+                        </button>
+                        <p style="color: #666; font-size: 0.7rem; margin-top: 5px;">Supports: JPG, PNG, GIF, WEBP (Max 5MB)</p>
+                    </div>
+                </div>
+                <input type="hidden" id="productImage" value="">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="productStatus">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-save" onclick="saveProduct()"><i class="fas fa-save"></i> Save</button>
+                <button class="btn-cancel" onclick="closeModal('productModal')"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===================== JAVASCRIPT ============================= -->
+    <!-- ============================================================ -->
+    <script>
+        // ============================================================
+        // DATA STORE
+        // ============================================================
+        let adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
+        let adminOrders = JSON.parse(localStorage.getItem('adminOrders')) || [];
+        let currentAdmin = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        // ============================================================
+        // CHECK ADMIN ACCESS
+        // ============================================================
+        function checkAdminAccess() {
+            if (!currentAdmin || currentAdmin.role !== 'admin') {
+                showNotification('Access denied! Please login as admin.', 'error');
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return false;
+            }
+            document.getElementById('adminName').textContent = currentAdmin.name || 'Admin';
+            document.getElementById('adminNameInput').value = currentAdmin.name || '';
+            return true;
+        }
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                showNotification('Logged out successfully!', 'info');
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 1000);
+            }
+        }
+
+        // ============================================================
+        // SHOW SECTION
+        // ============================================================
+        function showSection(section, element) {
+            document.querySelectorAll('.section').forEach(function(s) {
+                s.classList.remove('active');
+            });
+            document.querySelectorAll('.menu-item').forEach(function(m) {
+                m.classList.remove('active');
+            });
+            
+            document.getElementById('section-' + section).classList.add('active');
+            element.classList.add('active');
+
+            if (section === 'dashboard') updateDashboard();
+            if (section === 'products') renderProducts();
+            if (section === 'users') renderUsers();
+            if (section === 'orders') renderOrders();
+        }
+
+        // ============================================================
+        // NOTIFICATION        // ============================================================
+        function showNotification(message, type) {
+            type = type || 'success';
+            var notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(function() {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ============================================================
+        // IMAGE UPLOAD
+        // ============================================================
+        function handleImageUpload(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('Image size must be less than 5MB!', 'error');
+                return;
+            }
+
+            var validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showNotification('Please upload a valid image (JPG, PNG, GIF, WEBP)!', 'error');
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imageData = e.target.result;
+                document.getElementById('productImage').value = imageData;
+                updateImagePreview(imageData);
+                showNotification('Image uploaded successfully!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateImagePreview(imageData) {
+            var preview = document.getElementById('imagePreview');
+            if (imageData) {
+                preview.innerHTML = '<img src="' + imageData + '" alt="Product Image">';
+            } else {
+                preview.innerHTML = `
+                    <div class="placeholder">
+                        <i class="fas fa-image"></i>
+                        <span>No image</span>
+                    </div>
+                `;
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('productImage').value = '';
+            document.getElementById('imageUpload').value = '';
+            updateImagePreview(null);
+        }
+
+        // ============================================================
+        // MODAL FUNCTIONS
+        // ============================================================
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+            // Reset form fields
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productImage').value = '';
+            document.getElementById('productCategory').value = 'Necklaces';
+            document.getElementById('productStatus').value = 'active';
+            document.getElementById('imageUpload').value = '';
+            updateImagePreview(null);
+        }
+
+        function openAddProductModal() {
+            document.getElementById('productModalTitle').textContent = 'Add Product';
+            // Reset all fields
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productImage').value = '';
+            document.getElementById('productCategory').value = 'Necklaces';
+            document.getElementById('productStatus').value = 'active';
+            document.getElementById('imageUpload').value = '';
+            updateImagePreview(null);
+            openModal('productModal');
+        }
+
+        // ============================================================
+        // FIXED: OPEN EDIT PRODUCT MODAL
+        // ============================================================
+        function openEditProductModal(id) {
+            // Find the product in adminProducts array
+            var product = null;
+            for (var i = 0; i < adminProducts.length; i++) {
+                if (adminProducts[i].id === id) {
+                    product = adminProducts[i];
+                    break;
+                }
+            }
+            
+            if (!product) {
+                showNotification('Product not found!', 'error');
+                return;
+            }
+            
+            console.log('Editing product:', product);
+            
+            // Set modal title
+            document.getElementById('productModalTitle').textContent = 'Edit Product';
+            
+            // Fill form with product data
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('productName').value = product.name || '';
+            document.getElementById('productPrice').value = product.price || '';
+            document.getElementById('productCategory').value = product.category || 'Necklaces';
+            document.getElementById('productStatus').value = product.status || 'active';
+            
+            // Handle image
+            if (product.image) {
+                document.getElementById('productImage').value = product.image;
+                updateImagePreview(product.image);
+            } else {
+                document.getElementById('productImage').value = '';
+                updateImagePreview(null);
+            }
+            
+            document.getElementById('imageUpload').value = '';
+            
+            // Open modal
+            openModal('productModal');
+        }
+
+        // ============================================================
+        // FIXED: SAVE PRODUCT (Add/Edit)
+        // ============================================================
+        function saveProduct() {
+            var id = document.getElementById('editProductId').value;
+            var name = document.getElementById('productName').value.trim();
+            var price = parseFloat(document.getElementById('productPrice').value);
+            var image = document.getElementById('productImage').value;
+            var category = document.getElementById('productCategory').value;
+            var status = document.getElementById('productStatus').value;
+
+            if (!name) {
+                showNotification('Please enter product name!', 'error');
+                return;
+            }
+            if (!price || price <= 0) {
+                showNotification('Please enter a valid price!', 'error');
+                return;
+            }
+
+            var productData = { 
+                name: name, 
+                price: price, 
+                image: image, 
+                category: category, 
+                status: status 
+            };
+
+            if (id) {
+                // EDIT EXISTING PRODUCT
+                var found = false;
+                for (var i = 0; i < adminProducts.length; i++) {
+                    if (adminProducts[i].id === parseInt(id)) {
+                        // Update the product
+                        adminProducts[i] = { 
+                            ...adminProducts[i], 
+                            ...productData 
+                        };
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (found) {
+                    showNotification('Product updated successfully!', 'success');
+                } else {
+                    showNotification('Product not found!', 'error');
+                    return;
+                }
+            } else {
+                // ADD NEW PRODUCT
+                productData.id = Date.now();
+                productData.createdAt = new Date().toISOString();
+                adminProducts.push(productData);
+                showNotification('Product added successfully!', 'success');
+            }
+
+            // Save to localStorage
+            localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
+            
+            // Sync to store
+            syncProductsToStore();
+            
+            // Close modal and refresh
+            closeModal('productModal');
+            renderProducts();
+            updateDashboard();
+        }
+
+        // ============================================================
+        // DELETE PRODUCT
+        // ============================================================
+        function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            adminProducts = adminProducts.filter(function(p) { return p.id !== id; });
+            localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
+            syncProductsToStore();
+            renderProducts();
+            updateDashboard();
+            showNotification('Product deleted!', 'info');
+        }
+
+        // ============================================================
+        // RENDER PRODUCTS
+        // ============================================================
+        function renderProducts() {
+            var tbody = document.getElementById('productsTableBody');
+            var searchTerm = document.getElementById('productSearch') ? document.getElementById('productSearch').value.toLowerCase() : '';
+
+            var filtered = adminProducts;
+            if (searchTerm) {
+                filtered = filtered.filter(function(p) {
+                    return p.name.toLowerCase().includes(searchTerm) ||
+                           p.category.toLowerCase().includes(searchTerm);
+                });
+            }
+
+            document.getElementById('productCount').textContent = adminProducts.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-box-open"></i><p>' + 
+                    (adminProducts.length === 0 ? 'No products added yet' : 'No products found') + 
+                    '</p></td></tr>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function(product, index) {
+                var imageHtml = product.image && product.image.startsWith('data:image') ? 
+                    '<img src="' + product.image + '" class="product-thumb" alt="' + product.name + '">' : 
+                    '<span style="color:#666; font-size:0.7rem;">No image</span>';
+                
+                html += '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + imageHtml + '</td>' +
+                    '<td>' + product.name + '</td>' +
+                    '<td>$' + (product.price || 0).toFixed(2) + '</td>' +
+                    '<td>' + (product.category || 'General') + '</td>' +
+                    '<td><span class="status-badge ' + (product.status || 'active') + '">' + (product.status || 'Active') + '</span></td>' +
+                    '<td>' +
+                        '<button class="action-btn" onclick="openEditProductModal(' + product.id + ')"><i class="fas fa-edit"></i></button> ' +
+                        '<button class="action-btn delete" onclick="deleteProduct(' + product.id + ')"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        function searchProducts() {
+            renderProducts();
+        }
+
+        // ============================================================
+        // SYNC PRODUCTS TO STORE
+        // ============================================================
+        function syncProductsToStore() {
+            var activeProducts = adminProducts.filter(function(p) { 
+                return p.status === 'active' || !p.status; 
+            });
+            
+            var storeProducts = activeProducts.map(function(p) {
+                return {
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    image: p.image || '',
+                    category: p.category || 'General',
+                    status: p.status || 'active'
+                };
+            });
+
+            localStorage.setItem('storeProducts', JSON.stringify(storeProducts));
+            localStorage.setItem('allProducts', JSON.stringify(adminProducts));
+            
+            showNotification('Products synced to store successfully! 🎉', 'success');
+        }
+
+        // ============================================================
+        // USERS
+        // ============================================================
+        function renderUsers() {
+            var users = JSON.parse(localStorage.getItem('users')) || [];
+            var tbody = document.getElementById('usersTableBody');
+            var searchTerm = document.getElementById('userSearch') ? document.getElementById('userSearch').value.toLowerCase() : '';
+
+            var filtered = users;
+            if (searchTerm) {
+                filtered = filtered.filter(function(u) {
+                    return u.name.toLowerCase().includes(searchTerm) ||
+                           u.email.toLowerCase().includes(searchTerm);
+                });
+            }
+
+            document.getElementById('userCount').textContent = users.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-users"></i><p>' + 
+                    (users.length === 0 ? 'No users registered' : 'No users found') + 
+                    '</p></td></tr>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function(user, index) {
+                html += '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + user.name + '</td>' +
+                    '<td>' + user.email + '</td>' +
+                    '<td><span class="status-badge ' + (user.role === 'admin' ? 'active' : 'pending') + '">' + (user.role || 'user') + '</span></td>' +
+                    '<td>' + (user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A') + '</td>' +
+                    '<td>' +
+                        (user.role !== 'admin' ? 
+                            '<button class="action-btn delete" onclick="deleteUser(' + user.id + ')"><i class="fas fa-trash"></i></button>' : 
+                            '<span style="color: #888; font-size: 0.7rem;">Protected</span>') +
+                    '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        function searchUsers() {
+            renderUsers();
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            var users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.filter(function(u) { return u.id !== id; });
+            localStorage.setItem('users', JSON.stringify(users));
+            renderUsers();
+            updateDashboard();
+            showNotification('User deleted!', 'info');
+        }
+
+        // ============================================================
+        // ORDERS
+        // ============================================================
+        function renderOrders() {
+            var tbody = document.getElementById('ordersTableBody');
+            var searchTerm = document.getElementById('orderSearch') ? document.getElementById('orderSearch').value.toLowerCase() : '';
+
+            var filtered = adminOrders;
+            if (searchTerm) {
+                filtered = filtered.filter(function(o) {
+                    return o.customer.toLowerCase().includes(searchTerm) ||
+                           o.id.toString().includes(searchTerm);
+                });
+            }
+
+            document.getElementById('orderCount').textContent = adminOrders.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-box"></i><p>' + 
+                    (adminOrders.length === 0 ? 'No orders yet' : 'No orders found') + 
+                    '</p></td></tr>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function(order) {
+                html += '<tr>' +
+                    '<td>#' + order.id + '</td>' +
+                    '<td>' + order.customer + '</td>' +
+                    '<td>' + order.items + ' items</td>' +
+                    '<td>$' + order.total.toFixed(2) + '</td>' +
+                    '<td><span class="status-badge ' + order.status + '">' + order.status + '</span></td>' +
+                    '<td>' + (order.date ? new Date(order.date).toLocaleDateString() : 'N/A') + '</td>' +
+                    '<td>' +
+                        '<button class="action-btn" onclick="updateOrderStatus(' + order.id + ')"><i class="fas fa-sync"></i></button> ' +
+                        '<button class="action-btn delete" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        function searchOrders() {
+            renderOrders();
+        }
+
+        function updateOrderStatus(id) {
+            var order = adminOrders.find(function(o) { return o.id === id; });
+            if (!order) return;
+            
+            var statuses = ['pending', 'active', 'inactive'];
+            var currentIndex = statuses.indexOf(order.status);
+            order.status = statuses[(currentIndex + 1) % statuses.length];
+            
+            localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+            renderOrders();
+            showNotification('Order status updated to ' + order.status + '!', 'info');
+        }
+
+        function deleteOrder(id) {
+            if (!confirm('Are you sure you want to delete this order?')) return;
+            adminOrders = adminOrders.filter(function(o) { return o.id !== id; });
+            localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+            renderOrders();
+            updateDashboard();
+            showNotification('Order deleted!', 'info');
+        }
+
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
+        function updateDashboard() {
+            var users = JSON.parse(localStorage.getItem('users')) || [];
+            document.getElementById('statUsers').textContent = users.length;
+            document.getElementById('statProducts').textContent = adminProducts.length;
+            document.getElementById('statOrders').textContent = adminOrders.length;
+
+            var totalRevenue = 0;
+            adminOrders.forEach(function(o) {
+                totalRevenue += o.total;
+            });
+            document.getElementById('statRevenue').textContent = '$' + totalRevenue.toFixed(2);
+        }
+
+        // ============================================================
+        // SETTINGS
+        // ============================================================
+        function saveSettings() {
+            var storeName = document.getElementById('storeName').value;
+            var storeEmail = document.getElementById('storeEmail').value;
+            
+            var settings = { storeName: storeName, storeEmail: storeEmail };
+            localStorage.setItem('storeSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully!', 'success');
+        }
+
+        function updateAdminProfile() {
+            var name = document.getElementById('adminNameInput').value.trim();
+            var password = document.getElementById('adminPasswordInput').value.trim();
+
+            if (!name) {
+                showNotification('Name is required!', 'error');
+                return;
+            }
+
+            var users = JSON.parse(localStorage.getItem('users')) || [];
+            var adminIndex = -1;
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].role === 'admin') {
+                    adminIndex = i;
+                    break;
+                }
+            }
+
+            if (adminIndex !== -1) {
+                users[adminIndex].name = name;
+                if (password && password.length >= 6) {
+                    users[adminIndex].password = password;
+                }
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (currentUser) {
+                    currentUser.name = name;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+                
+                document.getElementById('adminName').textContent = name;
+                showNotification('Profile updated successfully!', 'success');
+            }
+        }
+
+        // ============================================================
+        // LOAD SETTINGS
+        // ============================================================
+        function loadSettings() {
+            var settings = JSON.parse(localStorage.getItem('storeSettings'));
+            if (settings) {
+                document.getElementById('storeName').value = settings.storeName || 'E-Sparkle Jewelry';
+                document.getElementById('storeEmail').value = settings.storeEmail || 'E-sparkle2009@gmail.com';
+            }
+        }
+
+        // ============================================================
+        // LOAD SAMPLE ORDERS
+        // ============================================================
+        function loadSampleOrders() {
+            if (adminOrders.length === 0) {
+                adminOrders = [
+                    { id: 1001, customer: 'John Doe', items: 3, total: 450.00, status: 'active', date: new Date().toISOString() },
+                    { id: 1002, customer: 'Jane Smith', items: 2, total: 280.00, status: 'pending', date: new Date(Date.now() - 86400000).toISOString() },
+                    { id: 1003, customer: 'Ali Khan', items: 1, total: 95.00, status: 'inactive', date: new Date(Date.now() - 172800000).toISOString() }
+                ];
+                localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+            }
+        }
+
+        // ============================================================
+        // LOAD SAMPLE PRODUCTS
+        // ============================================================
+        function loadSampleProducts() {
+            if (adminProducts.length === 0) {
+                adminProducts = [
+                    { id: 1, name: 'Diamond Necklace', price: 299.99, image: '', category: 'Necklaces', status: 'active', createdAt: new Date().toISOString() },
+                    { id: 2, name: 'Gold Ring', price: 149.99, image: '', category: 'Rings', status: 'active', createdAt: new Date().toISOString() },
+                    { id: 3, name: 'Silver Earrings', price: 79.99, image: '', category: 'Earrings', status: 'active', createdAt: new Date().toISOString() }
+                ];
+                localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
+                syncProductsToStore();
+            }
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAdminAccess()) return;
+
+            loadSampleOrders();
+            loadSampleProducts();
+            loadSettings();
+            updateDashboard();
+            renderProducts();
+            renderUsers();
+            renderOrders();
+
+            // Enter key support for search
+            var productSearch = document.getElementById('productSearch');
+            if (productSearch) {
+                productSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchProducts();
+                });
+            }
+
+            var userSearch = document.getElementById('userSearch');
+            if (userSearch) {
+                userSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchUsers();
+                });
+            }
+
+            var orderSearch = document.getElementById('orderSearch');
+            if (orderSearch) {
+                orderSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchOrders();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

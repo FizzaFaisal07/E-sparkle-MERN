@@ -630,6 +630,109 @@
     </div>
 
     <script>
+
+            // ============================================
+// API CONFIGURATION - For All Pages
+// ============================================
+const API_URL = 'http://localhost:5000/api';
+
+// Get token from localStorage
+const getToken = () => localStorage.getItem('token');
+
+// API Headers
+const getHeaders = () => {
+    const token = getToken();
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+};
+
+// Handle API response
+const handleResponse = async (response) => {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || 'Request failed');
+    }
+    return data;
+};
+
+// ============================================
+// PRODUCT API
+// ============================================
+async function loadProductsFromAPI() {
+    try {
+        const response = await fetch(`${API_URL}/products`);
+        const data = await handleResponse(response);
+        return data.products;
+    } catch (error) {
+        console.error('Error loading products:', error);
+        return [];
+    }
+}
+
+// ============================================
+// CART API
+// ============================================
+async function addToCartAPI(productId, quantity = 1) {
+    try {
+        const token = getToken();
+        if (!token) {
+            // Fallback to localStorage
+            addToCartLocal(productId, quantity);
+            return;
+        }
+        
+        const response = await fetch(`${API_URL}/cart/add`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ productId, quantity })
+        });
+        return await handleResponse(response);
+    } catch (error) {
+        console.error('Add to cart error:', error);
+        // Fallback to localStorage
+        addToCartLocal(productId, quantity);
+    }
+}
+
+// ============================================
+// AUTH API
+// ============================================
+async function loginAPI(email, password) {
+    const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    return handleResponse(response);
+}
+
+async function registerAPI(userData) {
+    const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    });
+    return handleResponse(response);
+}
+
+// ============================================
+// FALLBACK: localStorage cart
+// ============================================
+function addToCartLocal(name, price, image) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let existing = cart.find(item => item.name === name);
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({ id: Date.now(), name, price, image, quantity: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showNotification(`${name} added to cart!`, 'success');
+}
+
         // ============================================================
         // USER MANAGEMENT
         // ============================================================
@@ -791,133 +894,92 @@
         // ============================================================
         // HANDLE LOGIN
         // ============================================================
-        function handleLogin() {
-            clearErrors();
-            var email = document.getElementById('loginEmail').value.trim();
-            var password = document.getElementById('loginPassword').value.trim();
-            var isValid = true;
-
-            if (!email || !isValidEmail(email)) {
-                showError('loginEmail', 'loginEmailError');
-                isValid = false;
+        // Replace handleLogin function
+async function handleLogin() {
+    clearErrors();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    
+    if (!email || !isValidEmail(email)) {
+        showError('loginEmail', 'loginEmailError');
+        return;
+    }
+    if (!password || password.length < 6) {
+        showError('loginPassword', 'loginPasswordError');
+        return;
+    }
+    
+    try {
+        const data = await loginAPI(email, password);
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        showNotification(`Welcome ${data.user.name}! 🎉`, 'success');
+        
+        setTimeout(() => {
+            if (data.user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
             }
+        }, 1500);
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
 
-            if (!password || password.length < 6) {
-                showError('loginPassword', 'loginPasswordError');
-                isValid = false;
+// Replace handleSignup function
+async function handleSignup() {
+    clearErrors();
+    
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+    const confirm = document.getElementById('signupConfirm').value.trim();
+    const role = document.getElementById('signupRole')?.value || 'customer';
+    const agree = document.getElementById('agreeTerms')?.checked || false;
+    
+    if (!name || name.length < 2) {
+        showError('signupName', 'signupNameError');
+        return;
+    }
+    if (!email || !isValidEmail(email)) {
+        showError('signupEmail', 'signupEmailError');
+        return;
+    }
+    if (!password || password.length < 6) {
+        showError('signupPassword', 'signupPasswordError');
+        return;
+    }
+    if (password !== confirm) {
+        showError('signupConfirm', 'signupConfirmError');
+        return;
+    }
+    if (!agree) {
+        showNotification('Please agree to Terms of Service', 'error');
+        return;
+    }
+    
+    try {
+        const data = await registerAPI({ name, email, password, role });
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        showNotification(`Welcome ${data.user.name}! 🎉`, 'success');
+        
+        setTimeout(() => {
+            if (data.user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
             }
-
-            if (!isValid) return;
-
-            var user = null;
-            for (var i = 0; i < users.length; i++) {
-                if (users[i].email === email && users[i].password === password) {
-                    user = users[i];
-                    break;
-                }
-            }
-
-            if (!user) {
-                showNotification('Invalid email or password!', 'error');
-                return;
-            }
-
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            showNotification('Welcome back, ' + user.name + '! 🎉', 'success');
-
-            setTimeout(function() {
-                if (user.role === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }, 1000);
-        }
-
-        // ============================================================
-        // HANDLE SIGNUP
-        // ============================================================
-        function handleSignup() {
-            clearErrors();
-            
-            var name = document.getElementById('signupName').value.trim();
-            var email = document.getElementById('signupEmail').value.trim();
-            var phone = document.getElementById('signupPhone').value.trim();
-            var password = document.getElementById('signupPassword').value.trim();
-            var confirm = document.getElementById('signupConfirm').value.trim();
-            var role = document.getElementById('signupRole').value;
-            var agree = document.getElementById('agreeTerms').checked;
-            
-            var isValid = true;
-
-            if (!name || name.length < 2) {
-                showError('signupName', 'signupNameError');
-                isValid = false;
-            }
-
-            if (!email || !isValidEmail(email)) {
-                showError('signupEmail', 'signupEmailError');
-                isValid = false;
-            }
-
-            if (!password || password.length < 6) {
-                showError('signupPassword', 'signupPasswordError');
-                isValid = false;
-            }
-
-            if (password !== confirm) {
-                showError('signupConfirm', 'signupConfirmError');
-                isValid = false;
-            }
-
-            if (!agree) {
-                showNotification('Please agree to the Terms of Service and Privacy Policy', 'error');
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            var userExists = false;
-            for (var i = 0; i < users.length; i++) {
-                if (users[i].email === email) {
-                    userExists = true;
-                    break;
-                }
-            }
-            
-            if (userExists) {
-                showNotification('User with this email already exists!', 'error');
-                return;
-            }
-
-            var newUser = {
-                id: Date.now(),
-                name: name,
-                email: email,
-                phone: phone || '',
-                password: password,
-                role: role,
-                createdAt: new Date().toISOString()
-            };
-
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-
-            var roleText = role === 'admin' ? 'Admin' : 'Customer';
-            showNotification('Account created successfully! Welcome ' + name + '! 🎉', 'success');
-
-            currentUser = newUser;
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-
-            setTimeout(function() {
-                if (newUser.role === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }, 1500);
-        }
+        }, 1500);
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
 
         // ============================================================
         // ENTER KEY SUPPORT

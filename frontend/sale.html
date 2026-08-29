@@ -636,6 +636,108 @@
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
 
 <script>
+
+        // ============================================
+// API CONFIGURATION - For All Pages
+// ============================================
+const API_URL = 'http://localhost:5000/api';
+
+// Get token from localStorage
+const getToken = () => localStorage.getItem('token');
+
+// API Headers
+const getHeaders = () => {
+    const token = getToken();
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+};
+
+// Handle API response
+const handleResponse = async (response) => {
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || 'Request failed');
+    }
+    return data;
+};
+
+// ============================================
+// PRODUCT API
+// ============================================
+async function loadProductsFromAPI() {
+    try {
+        const response = await fetch(`${API_URL}/products`);
+        const data = await handleResponse(response);
+        return data.products;
+    } catch (error) {
+        console.error('Error loading products:', error);
+        return [];
+    }
+}
+
+// ============================================
+// CART API
+// ============================================
+async function addToCartAPI(productId, quantity = 1) {
+    try {
+        const token = getToken();
+        if (!token) {
+            // Fallback to localStorage
+            addToCartLocal(productId, quantity);
+            return;
+        }
+        
+        const response = await fetch(`${API_URL}/cart/add`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ productId, quantity })
+        });
+        return await handleResponse(response);
+    } catch (error) {
+        console.error('Add to cart error:', error);
+        // Fallback to localStorage
+        addToCartLocal(productId, quantity);
+    }
+}
+
+// ============================================
+// AUTH API
+// ============================================
+async function loginAPI(email, password) {
+    const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    return handleResponse(response);
+}
+
+async function registerAPI(userData) {
+    const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    });
+    return handleResponse(response);
+}
+
+// ============================================
+// FALLBACK: localStorage cart
+// ============================================
+function addToCartLocal(name, price, image) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let existing = cart.find(item => item.name === name);
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({ id: Date.now(), name, price, image, quantity: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    showNotification(`${name} added to cart!`, 'success');
+}
     // ========== CART FUNCTIONALITY ==========
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - E-Sparkle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 2rem;
+        }
+        .cart-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #141414;
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        th {
+            color: #d4af37;
+        }
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .remove-btn:hover { background: #c0392b; }
+        .quantity-btn {
+            background: #d4af37;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .total {
+            text-align: right;
+            padding: 1rem;
+            font-size: 1.5rem;
+            color: #d4af37;
+        }
+        .checkout {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        .checkout:hover {
+            background: #219a52;
+            transform: scale(1.02);
+        }
+        .back-btn {
+            background: #d4af37;
+            color: #0a0a0a;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-right: 1rem;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0c45a;
+            transform: scale(1.02);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #d4af37; color: #0a0a0a; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .navbar {
+            background: #0f0f0f;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 2rem;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2rem;
+        }
+        nav ul li a {
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        nav ul li a:hover { color: #d4af37; }
+        .cart-badge {
+            background: #e67e22;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            position: absolute;
+            top: -8px;
+            right: -12px;
+        }
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 150%;
+            left: 0;
+            background: #1a1a1a;
+            min-width: 140px;
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            display: none;
+            border: 1px solid #d4af37;
+        }
+        .dropdown.open .dropdown-menu { display: block; }
+        .dropdown-menu li { display: block; margin: 0; }
+        .dropdown-menu li a {
+            display: block;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+        }
+        .dropdown-menu li a:hover { background: #2a2a2a; }
+        .dropdown-toggle::after {
+            content: "▼";
+            font-size: 0.6rem;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+        }
+        .empty-cart a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .empty-cart a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .cart-container { padding: 1rem; }
+            nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+            th, td { padding: 0.5rem; font-size: 0.85rem; }
+            .total { font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            th, td { padding: 0.3rem; font-size: 0.75rem; }
+            .quantity-btn { padding: 3px 6px; font-size: 0.7rem; }
+            .remove-btn { padding: 3px 8px; font-size: 0.7rem; }
+            .back-btn { padding: 6px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b>Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+            <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+            <li style="position: relative;">
+                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="cart-container">
+    <h1 style="color:#d4af37;">🛒 Your Cart</h1>
+    <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+    <div id="cartContent"></div>
+</div>
+
+
+<script>
+// ============================================================
+// API CONFIGURATION
+// ============================================================
+const API_URL = 'http://localhost:5000/api';
+
+// ============================================================
+// CART DATA
+// ============================================================
+let cartItems = [];
+
+// ============================================================
+// LOAD CART
+// ============================================================
+function loadCart() {
+    console.log('🔄 Loading cart...');
+    
+    // Get cart from localStorage
+    const stored = localStorage.getItem('cart');
+    if (stored) {
+        try {
+            cartItems = JSON.parse(stored);
+            console.log(`📦 Loaded ${cartItems.length} items from localStorage`);
+        } catch (e) {
+            cartItems = [];
+        }
+    } else {
+        cartItems = [];
+    }
+    
+    displayCart();
+    updateCartCount();
+}
+
+// ============================================================
+// DISPLAY CART
+// ============================================================
+function displayCart() {
+    const container = document.getElementById('cartContent');
+    if (!container) return;
+    
+    if (cartItems.length === 0) {
+        container.innerHTML = `
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart" style="font-size:4rem; color:#666; display:block; margin-bottom:1rem;"></i>
+                <p>Your cart is empty.</p>
+                <a href="html 1.htm" style="color:#d4af37; font-weight:600;">Start Shopping →</a>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    let total = 0;
+    
+    cartItems.forEach((item, index) => {
+        const name = item.name || 'Product';
+        const price = item.price || 0;
+        const quantity = item.quantity || 1;
+        const image = item.image || 'img/placeholder.jpg';
+        const subtotal = price * quantity;
+        total += subtotal;
+        const itemId = item.id || item._id || index;
+        
+        html += `
+            <tr>
+                <td>
+                    <img src="${image}" alt="${name}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; vertical-align:middle; margin-right:10px;">
+                    ${name}
+                </td>
+                <td>$${price.toFixed(2)}</td>
+                <td>
+                    <button class="quantity-btn" onclick="updateQuantity(${itemId}, -1)">-</button>
+                    ${quantity}
+                    <button class="quantity-btn" onclick="updateQuantity(${itemId}, 1)">+</button>
+                </td>
+                <td>$${subtotal.toFixed(2)}</td>
+                <td><button class="remove-btn" onclick="removeFromCart(${itemId})">Remove</button></td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align:right; font-weight:bold;">Total:</td>
+                    <td style="font-weight:bold; color:#d4af37; font-size:1.2rem;">$${total.toFixed(2)}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        <div style="text-align:right; margin-top:1.5rem;">
+            <button class="checkout" onclick="checkout()">
+                <i class="fas fa-check"></i> Proceed to Checkout
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// ============================================================
+// UPDATE QUANTITY
+// ============================================================
+function updateQuantity(itemId, change) {
+    console.log(`🔄 Updating quantity for item ${itemId}: ${change}`);
+    
+    // Find item by id (could be id or _id)
+    const itemIndex = cartItems.findIndex(item => 
+        item.id === itemId || item._id === itemId
+    );
+    
+    if (itemIndex === -1) {
+        console.error('❌ Item not found:', itemId);
+        return;
+    }
+    
+    const newQuantity = cartItems[itemIndex].quantity + change;
+    
+    if (newQuantity <= 0) {
+        // Remove item
+        cartItems.splice(itemIndex, 1);
+        showNotification('Item removed from cart', 'info');
+    } else {
+        // Update quantity
+        cartItems[itemIndex].quantity = newQuantity;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    
+    // Update display
+    displayCart();
+    updateCartCount();
+}
+
+// ============================================================
+// REMOVE FROM CART
+// ============================================================
+function removeFromCart(itemId) {
+    console.log(`🗑️ Removing item ${itemId} from cart`);
+    
+    const itemIndex = cartItems.findIndex(item => 
+        item.id === itemId || item._id === itemId
+    );
+    
+    if (itemIndex === -1) {
+        console.error('❌ Item not found:', itemId);
+        return;
+    }
+    
+    const itemName = cartItems[itemIndex].name || 'Item';
+    cartItems.splice(itemIndex, 1);
+    
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    
+    displayCart();
+    updateCartCount();
+    showNotification(`${itemName} removed from cart`, 'info');
+}
+
+// ============================================================
+// CHECKOUT
+// ============================================================
+function checkout() {
+    if (cartItems.length === 0) {
+        showNotification('Your cart is empty!', 'error');
+        return;
+    }
+    
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        // Redirect to login
+        if (confirm('Please login to proceed with checkout. Go to login?')) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+    
+    // Proceed with checkout
+    if (confirm(`Total: $${total.toFixed(2)}\nProceed to checkout?`)) {
+        // Clear cart
+        cartItems = [];
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+        displayCart();
+        updateCartCount();
+        showNotification('Order placed successfully! 🎉', 'success');
+    }
+}
+
+// ============================================================
+// UPDATE CART COUNT (Badge)
+// ============================================================
+function updateCartCount() {
+    const count = cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
+    const badge = document.getElementById('cartCount');
+    if (badge) {
+        badge.innerText = count;
+        badge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    console.log(`🛒 Cart count updated: ${count}`);
+}
+
+// ============================================================
+// NOTIFICATION
+// ============================================================
+function showNotification(message, type) {
+    type = type || 'success';
+    const notification = document.createElement('div');
+    notification.className = 'notification ' + type;
+    notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// ============================================================
+// AUTH LINK
+// ============================================================
+function updateAuthLink() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const authLink = document.getElementById('authLink');
+    const authText = document.getElementById('authText');
+    
+    if (authLink && authText) {
+        if (user) {
+            authText.textContent = 'Logout';
+            authLink.href = '#';
+            authLink.onclick = function(e) {
+                e.preventDefault();
+                if (confirm('Logout?')) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    showNotification('Logged out!', 'info');
+                    setTimeout(() => window.location.href = 'login.html', 1000);
+                }
+            };
+        } else {
+            authText.textContent = 'Login';
+            authLink.href = 'login.html';
+        }
+    }
+}
+
+// ============================================================
+// DROPDOWN
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Cart page loaded');
+    loadCart();
+    updateAuthLink();
+    
+    // Dropdown
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.closest('.dropdown').classList.toggle('open');
+        });
+    });
+    
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown.open').forEach(drop => {
+            if (!drop.contains(e.target)) drop.classList.remove('open');
+        });
+    });
+});
+</script>
+</body>
+</html>

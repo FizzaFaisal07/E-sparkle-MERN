@@ -1,12 +1,14 @@
 const Order = require('../models/Order');
-const Product = require('../models/Product');
-const User = require('../models/User');
 
 // ========== CREATE ORDER ==========
 exports.createOrder = async (req, res) => {
     try {
+        console.log('📦 Creating order for user:', req.user?._id || 'Unknown');
+        console.log('📦 Order data received:', req.body);
+        
         const { items, shippingAddress, paymentMethod, notes } = req.body;
 
+        // Validate required fields
         if (!items || items.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -14,91 +16,107 @@ exports.createOrder = async (req, res) => {
             });
         }
 
-        // Validate items and calculate totals
-        let subtotal = 0;
-        const orderItems = [];
-        const productIds = items.map(item => item.productId);
-
-        const products = await Product.find({
-            _id: { $in: productIds },
-            status: 'active'
-        });
-
-        // Check if all products exist
-        if (products.length !== items.length) {
+        if (!shippingAddress) {
             return res.status(400).json({
                 success: false,
-                message: 'Some products are not available'
+                message: 'Shipping address is required'
             });
         }
 
-        // Process each item
-        for (const item of items) {
-            const product = products.find(p => p._id.toString() === item.productId);
+        // Process items
+        let subtotal = 0;
+        const orderItems = [];
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
             
-            if (!product) {
-                return res.status(404).json({
-                    success: false,
-                    message: `Product not found: ${item.productId}`
-                });
-            }
+            // Get product ID from various possible fields
+            const productId = item.productId || item.id || item._id || null;
+            
+            // Use provided data
+            const price = parseFloat(item.price) || 0;
+            const quantity = parseInt(item.quantity) || 1;
+            const productName = item.name || 'Product';
+            const productImage = item.image || '';
 
-            if (product.stock < item.quantity) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Insufficient stock for ${product.name}. Available: ${product.stock}`
-                });
-            }
+            subtotal += price * quantity;
 
-            const price = product.isOnSale && product.discountPercentage > 0
-                ? product.price * (1 - product.discountPercentage / 100)
-                : product.price;
-
-            subtotal += price * item.quantity;
-
+            // Add to order items
             orderItems.push({
-                product: product._id,
-                name: product.name,
+                product: productId,
+                productId: productId ? String(productId) : null,
+                name: productName,
                 price: price,
-                quantity: item.quantity,
-                image: product.image
+                quantity: quantity,
+                image: productImage
             });
+        }
 
-            // Update stock
-            product.stock -= item.quantity;
-            await product.save();
+        if (orderItems.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No valid items in order'
+            });
         }
 
         // Calculate totals
-        const shippingCost = subtotal > 100 ? 0 : 10; // Free shipping over $100
-        const tax = subtotal * 0.05; // 5% tax
+        const shippingCost = subtotal > 100 ? 0 : 10;
+        const tax = subtotal * 0.05;
         const totalAmount = subtotal + shippingCost + tax;
 
-        // Create order
-        const order = new Order({
+        // Create order object
+        const orderData = {
             user: req.user._id,
             items: orderItems,
             subtotal,
             shippingCost,
             tax,
             totalAmount,
-            shippingAddress,
+            shippingAddress: {
+                fullName: shippingAddress.fullName || req.user.name || 'Customer',
+                phone: shippingAddress.phone || req.user.phone || 'N/A',
+                address: shippingAddress.address || 'N/A',
+                city: shippingAddress.city || 'N/A',
+                state: shippingAddress.state || '',
+                zipCode: shippingAddress.zipCode || 'N/A',
+                country: shippingAddress.country || 'Pakistan'
+            },
             paymentMethod: paymentMethod || 'cash_on_delivery',
-            notes
-        });
+            notes: notes || ''
+        };
 
+        // Create and save order
+        const order = new Order(orderData);
         await order.save();
+        
+        // Populate order for response
+        await order.populate('user', 'name email phone');
+        
+        console.log('✅ Order created successfully:', order.orderNumber || order._id);
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: 'Order created successfully',
-            order
+            order: order
         });
+
     } catch (error) {
-        console.error('Create order error:', error);
-        res.status(500).json({
+        console.error('❌ Create order error:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        
+        // Check for validation errors
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error: ' + errors.join(', ')
+            });
+        }
+        
+        return res.status(500).json({
             success: false,
-            message: error.message || 'Failed to create order'
+            message: error.message || 'Failed to create order',
+            error: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };
@@ -107,17 +125,16 @@ exports.createOrder = async (req, res) => {
 exports.getMyOrders = async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user._id })
-            .sort({ createdAt: -1 })
-            .populate('items.product', 'name price image');
+            .sort({ createdAt: -1 });
 
-        res.json({
+        return res.json({
             success: true,
             count: orders.length,
             orders
         });
     } catch (error) {
-        console.error('Get orders error:', error);
-        res.status(500).json({
+        console.error('❌ Get orders error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to get orders'
         });
@@ -128,7 +145,6 @@ exports.getMyOrders = async (req, res) => {
 exports.getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
-            .populate('items.product', 'name price image')
             .populate('user', 'name email phone address');
 
         if (!order) {
@@ -138,7 +154,6 @@ exports.getOrderById = async (req, res) => {
             });
         }
 
-        // Check if user owns the order or is admin
         if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
@@ -146,13 +161,13 @@ exports.getOrderById = async (req, res) => {
             });
         }
 
-        res.json({
+        return res.json({
             success: true,
             order
         });
     } catch (error) {
-        console.error('Get order error:', error);
-        res.status(500).json({
+        console.error('❌ Get order error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to get order'
         });
@@ -171,7 +186,6 @@ exports.cancelOrder = async (req, res) => {
             });
         }
 
-        // Check ownership
         if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
@@ -179,7 +193,6 @@ exports.cancelOrder = async (req, res) => {
             });
         }
 
-        // Check if order can be cancelled
         if (order.status === 'delivered') {
             return res.status(400).json({
                 success: false,
@@ -194,25 +207,17 @@ exports.cancelOrder = async (req, res) => {
             });
         }
 
-        // Update order status
         order.status = 'cancelled';
         await order.save();
 
-        // Restore stock
-        for (const item of order.items) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { stock: item.quantity }
-            });
-        }
-
-        res.json({
+        return res.json({
             success: true,
             message: 'Order cancelled successfully',
             order
         });
     } catch (error) {
-        console.error('Cancel order error:', error);
-        res.status(500).json({
+        console.error('❌ Cancel order error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to cancel order'
         });
@@ -238,12 +243,11 @@ exports.getAllOrders = async (req, res) => {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit))
-            .populate('user', 'name email phone')
-            .populate('items.product', 'name price image');
+            .populate('user', 'name email phone');
 
         const total = await Order.countDocuments(filter);
 
-        res.json({
+        return res.json({
             success: true,
             count: orders.length,
             total,
@@ -252,8 +256,8 @@ exports.getAllOrders = async (req, res) => {
             orders
         });
     } catch (error) {
-        console.error('Get all orders error:', error);
-        res.status(500).json({
+        console.error('❌ Get all orders error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to get orders'
         });
@@ -281,7 +285,6 @@ exports.updateOrderStatus = async (req, res) => {
             });
         }
 
-        // If delivered, set deliveredAt
         if (status === 'delivered' && order.status !== 'delivered') {
             order.deliveredAt = new Date();
         }
@@ -289,14 +292,14 @@ exports.updateOrderStatus = async (req, res) => {
         order.status = status;
         await order.save();
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Order status updated successfully',
             order
         });
     } catch (error) {
-        console.error('Update order status error:', error);
-        res.status(500).json({
+        console.error('❌ Update order status error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to update order status'
         });
@@ -330,14 +333,14 @@ exports.updatePaymentStatus = async (req, res) => {
         }
         await order.save();
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Payment status updated successfully',
             order
         });
     } catch (error) {
-        console.error('Update payment status error:', error);
-        res.status(500).json({
+        console.error('❌ Update payment status error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to update payment status'
         });
@@ -355,24 +358,15 @@ exports.deleteOrder = async (req, res) => {
             });
         }
 
-        // Restore stock if order is not delivered
-        if (order.status !== 'delivered' && order.status !== 'cancelled') {
-            for (const item of order.items) {
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { stock: item.quantity }
-                });
-            }
-        }
-
         await order.deleteOne();
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Order deleted successfully'
         });
     } catch (error) {
-        console.error('Delete order error:', error);
-        res.status(500).json({
+        console.error('❌ Delete order error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to delete order'
         });
@@ -407,7 +401,7 @@ exports.getOrderStats = async (req, res) => {
             .limit(5)
             .populate('user', 'name email');
 
-        res.json({
+        return res.json({
             success: true,
             stats: {
                 totalOrders,
@@ -417,8 +411,8 @@ exports.getOrderStats = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Get order stats error:', error);
-        res.status(500).json({
+        console.error('❌ Get order stats error:', error);
+        return res.status(500).json({
             success: false,
             message: error.message || 'Failed to get order statistics'
         });

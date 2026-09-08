@@ -4,7 +4,14 @@ const OrderSchema = new mongoose.Schema({
     orderNumber: {
         type: String,
         unique: true,
-        required: true
+        default: function() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `ESP-${year}${month}${day}-${random}`;
+        }
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,9 +20,13 @@ const OrderSchema = new mongoose.Schema({
     },
     items: [{
         product: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.Mixed,
             ref: 'Product',
-            required: true
+            required: false
+        },
+        productId: {
+            type: String,
+            required: false
         },
         name: {
             type: String,
@@ -110,23 +121,39 @@ const OrderSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Generate order number before saving
-OrderSchema.pre('save', function(next) {
-    if (this.isNew) {
+// ============================================================
+// SINGLE PRE-SAVE HOOK - Generate order number and calculate total
+// ============================================================
+OrderSchema.pre('save', async function() {
+    // Generate order number for new orders
+    if (this.isNew && !this.orderNumber) {
         const date = new Date();
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        this.orderNumber = `ESP-${year}${month}${day}-${random}`;
-    }
-    next();
-});
+        const random = Math.floor(Math.random() * 10000)
+            .toString()
+            .padStart(4, '0');
 
-// Update total amount before saving
-OrderSchema.pre('save', function(next) {
-    this.totalAmount = this.subtotal - this.discountAmount + this.shippingCost + this.tax;
-    next();
+        this.orderNumber = `ESP-${year}${month}${day}-${random}`;
+
+        console.log('📦 Generated order number:', this.orderNumber);
+    }
+
+    // Calculate total amount
+    if (
+        this.isModified('subtotal') ||
+        this.isModified('discountAmount') ||
+        this.isModified('shippingCost') ||
+        this.isModified('tax') ||
+        !this.totalAmount
+    ) {
+        this.totalAmount =
+            this.subtotal -
+            this.discountAmount +
+            this.shippingCost +
+            this.tax;
+    }
 });
 
 // Indexes
@@ -134,6 +161,7 @@ OrderSchema.index({ user: 1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ createdAt: -1 });
 OrderSchema.index({ 'shippingAddress.phone': 1 });
+OrderSchema.index({ orderNumber: 1 });
 
-// ✅ Check if model exists before creating
+// Check if model exists before creating
 module.exports = mongoose.models.Order || mongoose.model('Order', OrderSchema);

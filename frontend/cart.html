@@ -47,6 +47,11 @@
             border-radius: 5px;
             cursor: pointer;
             margin: 0 5px;
+            color: #0a0a0a;
+            font-weight: bold;
+        }
+        .quantity-btn:hover {
+            background: #f0c45a;
         }
         .total {
             text-align: right;
@@ -63,10 +68,16 @@
             cursor: pointer;
             font-size: 1rem;
             margin-top: 1rem;
+            transition: 0.3s;
         }
         .checkout:hover {
             background: #219a52;
             transform: scale(1.02);
+        }
+        .checkout:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         .back-btn {
             background: #d4af37;
@@ -82,6 +93,19 @@
             background: #f0c45a;
             transform: scale(1.02);
         }
+        .clear-cart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .clear-cart-btn:hover {
+            background: #c0392b;
+        }
 
         /* Notification */
         .notification {
@@ -95,6 +119,7 @@
             animation: slideIn 0.3s ease;
             font-size: 0.85rem;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
         }
         .notification.success { background: #27ae60; }
         .notification.error { background: #e74c3c; }
@@ -139,6 +164,9 @@
             position: absolute;
             top: -8px;
             right: -12px;
+            min-width: 18px;
+            text-align: center;
+            display: none;
         }
         .dropdown { position: relative; }
         .dropdown-menu {
@@ -180,12 +208,68 @@
             text-decoration: underline;
         }
 
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Payment Options */
+        .payment-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .payment-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: 0.3s;
+            color: white;
+        }
+        .payment-btn:hover {
+            transform: scale(1.02);
+        }
+        .payment-btn.cod {
+            background: #d4af37;
+            color: #0a0a0a;
+        }
+        .payment-btn.cod:hover {
+            background: #f0c45a;
+        }
+        .payment-btn.card {
+            background: #6772e5;
+        }
+        .payment-btn.card:hover {
+            background: #5469d4;
+        }
+        .payment-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .cart-container { padding: 1rem; }
             nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
             th, td { padding: 0.5rem; font-size: 0.85rem; }
             .total { font-size: 1.2rem; }
+            .payment-options { justify-content: center; }
         }
         @media (max-width: 480px) {
             th, td { padding: 0.3rem; font-size: 0.75rem; }
@@ -200,30 +284,34 @@
 <div class="navbar">
     <nav>
         <ul>
-            <li><b><a href="index.html">Home</a></b></li>
-            <li class="dropdown">
-                <b><a href="#" class="dropdown-toggle">Shop</a></b>
-                <ul class="dropdown-menu">
-                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
-                    <li><a href="html 1.htm"><b>Rings</b></a></li>
-                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
-                    <li><a href="html2.htm"><b>Bangles</b></a></li>
-                    <li><a href="html2.htm"><b>Watches</b></a></li>
-                </ul>
-            </li>
-            <li><b><a href="contact1.html">Contact</a></b></li>
-            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
-            <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
-            <li style="position: relative;">
-                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
-            </li>
+    <li><b><a href="index.html">Home</a></b></li>
+    <li class="dropdown">
+        <b><a href="#" class="dropdown-toggle">Shop</a></b>
+        <ul class="dropdown-menu">
+            <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+            <li><a href="html 1.htm"><b>Rings</b></a></li>
+            <li><a href="html 1.htm"><b>Earrings</b></a></li>
+            <li><a href="html2.htm"><b>Bangles</b></a></li>
+            <li><a href="html2.htm"><b>Watches</b></a></li>
         </ul>
+    </li>
+    <li><b><a href="contact1.html">Contact</a></b></li>
+    <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+    <li><b><a href="orders.html" style="color:#d4af37;">📦 Orders</a></b></li>
+    <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+    <li style="position: relative;">
+        <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+    </li>
+</ul>
     </nav>
 </div>
 
 <div class="cart-container">
     <h1 style="color:#d4af37;">🛒 Your Cart</h1>
-    <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+        <button class="clear-cart-btn" onclick="clearCart()"><i class="fas fa-trash"></i> Clear Cart</button>
+    </div>
     <div id="cartContent"></div>
 </div>
 
@@ -245,7 +333,6 @@ let cartItems = [];
 function loadCart() {
     console.log('🔄 Loading cart...');
     
-    // Get cart from localStorage
     const stored = localStorage.getItem('cart');
     if (stored) {
         try {
@@ -308,17 +395,17 @@ function displayCart() {
         html += `
             <tr>
                 <td>
-                    <img src="${image}" alt="${name}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; vertical-align:middle; margin-right:10px;">
+                    <img src="${image}" alt="${name}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; vertical-align:middle; margin-right:10px;" onerror="this.src='img/placeholder.jpg'">
                     ${name}
                 </td>
                 <td>$${price.toFixed(2)}</td>
                 <td>
-                    <button class="quantity-btn" onclick="updateQuantity(${itemId}, -1)">-</button>
+                    <button class="quantity-btn" onclick="updateQuantity('${itemId}', -1)">-</button>
                     ${quantity}
-                    <button class="quantity-btn" onclick="updateQuantity(${itemId}, 1)">+</button>
+                    <button class="quantity-btn" onclick="updateQuantity('${itemId}', 1)">+</button>
                 </td>
                 <td>$${subtotal.toFixed(2)}</td>
-                <td><button class="remove-btn" onclick="removeFromCart(${itemId})">Remove</button></td>
+                <td><button class="remove-btn" onclick="removeFromCart('${itemId}')">Remove</button></td>
             </tr>
         `;
     });
@@ -334,9 +421,14 @@ function displayCart() {
             </tfoot>
         </table>
         <div style="text-align:right; margin-top:1.5rem;">
-            <button class="checkout" onclick="checkout()">
-                <i class="fas fa-check"></i> Proceed to Checkout
-            </button>
+            <div class="payment-options">
+                <button class="payment-btn cod" id="checkoutBtn" onclick="checkout('cash_on_delivery')">
+                    <i class="fas fa-truck"></i> Cash on Delivery
+                </button>
+                <button class="payment-btn card" id="cardCheckoutBtn" onclick="checkout('card')" style="background: #6772e5;">
+                    <i class="fas fa-credit-card"></i> Pay with Card
+                </button>
+            </div>
         </div>
     `;
     
@@ -349,9 +441,8 @@ function displayCart() {
 function updateQuantity(itemId, change) {
     console.log(`🔄 Updating quantity for item ${itemId}: ${change}`);
     
-    // Find item by id (could be id or _id)
     const itemIndex = cartItems.findIndex(item => 
-        item.id === itemId || item._id === itemId
+        String(item.id) === String(itemId) || String(item._id) === String(itemId)
     );
     
     if (itemIndex === -1) {
@@ -362,18 +453,13 @@ function updateQuantity(itemId, change) {
     const newQuantity = cartItems[itemIndex].quantity + change;
     
     if (newQuantity <= 0) {
-        // Remove item
         cartItems.splice(itemIndex, 1);
         showNotification('Item removed from cart', 'info');
     } else {
-        // Update quantity
         cartItems[itemIndex].quantity = newQuantity;
     }
     
-    // Save to localStorage
     localStorage.setItem('cart', JSON.stringify(cartItems));
-    
-    // Update display
     displayCart();
     updateCartCount();
 }
@@ -385,7 +471,7 @@ function removeFromCart(itemId) {
     console.log(`🗑️ Removing item ${itemId} from cart`);
     
     const itemIndex = cartItems.findIndex(item => 
-        item.id === itemId || item._id === itemId
+        String(item.id) === String(itemId) || String(item._id) === String(itemId)
     );
     
     if (itemIndex === -1) {
@@ -397,42 +483,161 @@ function removeFromCart(itemId) {
     cartItems.splice(itemIndex, 1);
     
     localStorage.setItem('cart', JSON.stringify(cartItems));
-    
     displayCart();
     updateCartCount();
     showNotification(`${itemName} removed from cart`, 'info');
 }
 
 // ============================================================
-// CHECKOUT
+// CLEAR CART
 // ============================================================
-function checkout() {
+function clearCart() {
+    if (cartItems.length === 0) {
+        showNotification('Cart is already empty!', 'info');
+        return;
+    }
+    if (confirm('Are you sure you want to clear your cart?')) {
+        cartItems = [];
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+        displayCart();
+        updateCartCount();
+        showNotification('Cart cleared!', 'info');
+    }
+}
+
+// ============================================================
+// CHECKOUT - Saves order to database
+// ============================================================
+async function checkout(paymentMethod) {
     if (cartItems.length === 0) {
         showNotification('Your cart is empty!', 'error');
         return;
     }
     
-    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
     // Check if user is logged in
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
     
-    if (!token) {
-        // Redirect to login
+    if (!token || !user) {
         if (confirm('Please login to proceed with checkout. Go to login?')) {
             window.location.href = 'login.html';
         }
         return;
     }
     
-    // Proceed with checkout
-    if (confirm(`Total: $${total.toFixed(2)}\nProceed to checkout?`)) {
-        // Clear cart
-        cartItems = [];
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-        displayCart();
-        updateCartCount();
-        showNotification('Order placed successfully! 🎉', 'success');
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Confirm checkout
+    const paymentMethodName = paymentMethod === 'cash_on_delivery' ? 'Cash on Delivery' : 'Card Payment';
+    if (!confirm(`Total: $${total.toFixed(2)}\nPayment: ${paymentMethodName}\nProceed to checkout?`)) {
+        return;
+    }
+    
+    // Disable all checkout buttons
+    const allButtons = document.querySelectorAll('.payment-btn');
+    allButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+    });
+    
+    try {
+        // Prepare order data
+        const orderData = {
+            items: cartItems.map(item => ({
+                productId: item.id || item._id || 'unknown_' + Date.now(),
+                name: item.name || 'Product',
+                price: parseFloat(item.price) || 0,
+                quantity: parseInt(item.quantity) || 1,
+                image: item.image || ''
+            })),
+            shippingAddress: {
+                fullName: user.name || 'Customer',
+                phone: user.phone || '0300-1234567',
+                address: user.address?.street || user.address?.address || '123 Main Street',
+                city: user.address?.city || 'Lahore',
+                state: user.address?.state || 'Punjab',
+                zipCode: user.address?.zipCode || '54000',
+                country: user.address?.country || 'Pakistan'
+            },
+            paymentMethod: paymentMethod || 'cash_on_delivery',
+            notes: `Order from E-Sparkle website (${new Date().toLocaleString()})`
+        };
+        
+        console.log('📦 Sending order to API:', JSON.stringify(orderData, null, 2));
+        
+        const response = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        const data = await response.json();
+        console.log('📦 Response from server:', data);
+        
+        if (response.ok && data.success) {
+            // Clear cart
+            cartItems = [];
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            displayCart();
+            updateCartCount();
+            
+            const orderNumber = data.order?.orderNumber || data.order?._id || '';
+            showNotification(`✅ Order placed successfully! Order #${orderNumber}`, 'success');
+            
+            // Reset buttons
+            const codBtn = document.getElementById('checkoutBtn');
+            const cardBtn = document.getElementById('cardCheckoutBtn');
+            if (codBtn) {
+                codBtn.disabled = false;
+                codBtn.innerHTML = '<i class="fas fa-truck"></i> Cash on Delivery';
+            }
+            if (cardBtn) {
+                cardBtn.disabled = false;
+                cardBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay with Card';
+            }
+            
+            setTimeout(() => {
+                if (confirm('Order placed! Would you like to view your orders?')) {
+                    window.location.href = 'orders.html';
+                }
+            }, 1500);
+            
+        } else {
+            // Show error message from server
+            const errorMsg = data.message || 'Unknown error occurred';
+            showNotification(`❌ Failed to place order: ${errorMsg}`, 'error');
+            console.error('❌ Server error:', data);
+            
+            // Reset buttons
+            const codBtn = document.getElementById('checkoutBtn');
+            const cardBtn = document.getElementById('cardCheckoutBtn');
+            if (codBtn) {
+                codBtn.disabled = false;
+                codBtn.innerHTML = '<i class="fas fa-truck"></i> Cash on Delivery';
+            }
+            if (cardBtn) {
+                cardBtn.disabled = false;
+                cardBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay with Card';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Checkout error:', error);
+        showNotification('❌ Error placing order: ' + error.message, 'error');
+        
+        // Reset buttons
+        const codBtn = document.getElementById('checkoutBtn');
+        const cardBtn = document.getElementById('cardCheckoutBtn');
+        if (codBtn) {
+            codBtn.disabled = false;
+            codBtn.innerHTML = '<i class="fas fa-truck"></i> Cash on Delivery';
+        }
+        if (cardBtn) {
+            cardBtn.disabled = false;
+            cardBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay with Card';
+        }
     }
 }
 
@@ -458,7 +663,9 @@ function showNotification(message, type) {
     notification.className = 'notification ' + type;
     notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
     document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    setTimeout(() => {
+        if (notification.parentNode) notification.remove();
+    }, 4000);
 }
 
 // ============================================================
@@ -473,6 +680,7 @@ function updateAuthLink() {
         if (user) {
             authText.textContent = 'Logout';
             authLink.href = '#';
+            authLink.style.color = '#e74c3c';
             authLink.onclick = function(e) {
                 e.preventDefault();
                 if (confirm('Logout?')) {
@@ -485,6 +693,8 @@ function updateAuthLink() {
         } else {
             authText.textContent = 'Login';
             authLink.href = 'login.html';
+            authLink.style.color = '#d4af37';
+            authLink.onclick = null;
         }
     }
 }

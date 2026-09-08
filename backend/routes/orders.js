@@ -2,17 +2,11 @@ const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 const { verifyToken, isAdmin } = require('../middleware/auth');
-const { validate, orderValidation } = require('../middleware/validation');
 
 // ========== USER ROUTES ==========
 
-// Create order
-router.post(
-    '/',
-    verifyToken,
-    validate(orderValidation.create),
-    orderController.createOrder
-);
+// Create order - REMOVED validation middleware
+router.post('/', verifyToken, orderController.createOrder);
 
 // Get user's orders
 router.get('/my-orders', verifyToken, orderController.getMyOrders);
@@ -29,35 +23,15 @@ router.put('/:id/cancel', verifyToken, orderController.cancelOrder);
 router.get('/', verifyToken, isAdmin, orderController.getAllOrders);
 
 // Update order status (admin)
-router.put(
-    '/:id/status',
-    verifyToken,
-    isAdmin,
-    orderController.updateOrderStatus
-);
+router.put('/:id/status', verifyToken, isAdmin, orderController.updateOrderStatus);
 
 // Update order payment status (admin)
-router.put(
-    '/:id/payment',
-    verifyToken,
-    isAdmin,
-    orderController.updatePaymentStatus
-);
+router.put('/:id/payment', verifyToken, isAdmin, orderController.updatePaymentStatus);
 
 // Delete order (admin)
-router.delete(
-    '/:id',
-    verifyToken,
-    isAdmin,
-    orderController.deleteOrder
-);
+router.delete('/:id', verifyToken, isAdmin, orderController.deleteOrder);
 
 // Get order statistics (admin)
-router.get(
-    '/stats/overview',
-    verifyToken,
-    isAdmin,
-    orderController.getOrderStats
-);
+router.get('/stats/overview', verifyToken, isAdmin, orderController.getOrderStats);
 
 module.exports = router;

@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - E-Sparkle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #000000 0%, #0e0d0d 100%);
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #d4af37;
+            position: relative;
+        }
+
+        .logo img {
+            max-width: 300px;
+            width: 80%;
+            filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #0f0f0f;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        nav ul li a:hover { color: #d4af37; }
+
+        /* Cart Badge */
+        .cart-badge {
+            background: #e67e22;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            min-width: 18px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 150%;
+            left: 0;
+            background: #1a1a1a;
+            min-width: 140px;
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            display: none;
+            border: 1px solid #d4af37;
+        }
+        .dropdown.open .dropdown-menu { display: block; }
+        .dropdown-menu li { display: block; margin: 0; }
+        .dropdown-menu li a {
+            display: block;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+        }
+        .dropdown-menu li a:hover { background: #2a2a2a; }
+        .dropdown-toggle::after {
+            content: "▼";
+            font-size: 0.6rem;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        /* Search */
+        .search-li { margin-left: auto; }
+        .search-box { display: flex; gap: 5px; align-items: center; }
+        .search-box input {
+            padding: 5px 10px;
+            border: 2px solid #333;
+            border-radius: 30px;
+            background: #1a1a1a;
+            color: #fff;
+            outline: none;
+            width: 120px;
+            font-size: 0.75rem;
+        }
+        .search-box input:focus { border-color: #d4af37; }
+        .search-box button {
+            background: #d4af37;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-box button i { font-size: 0.7rem; color: #0a0a0a; }
+
+        .navbar h2 {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #d4af37;
+            font-size: 0.8rem;
+        }
+
+        /* Orders Container */
+        .orders-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .orders-header h1 {
+            color: #d4af37;
+            font-size: 2rem;
+        }
+
+        .orders-header .back-btn {
+            background: #d4af37;
+            color: #0a0a0a;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .orders-header .back-btn:hover {
+            background: #f0c45a;
+            transform: scale(1.02);
+        }
+
+        /* Order Card */
+        .order-card {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: #d4af37;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 1rem;
+        }
+
+        .order-header .order-number {
+            color: #d4af37;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .order-header .order-date {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .order-status.pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .order-status.processing {
+            background: #3498db;
+            color: white;
+        }
+
+        .order-status.shipped {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .order-status.delivered {
+            background: #27ae60;
+            color: white;
+        }
+
+        .order-status.cancelled {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .order-status.refunded {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .order-items {
+            display: grid;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .order-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .order-item .item-info {
+            flex: 1;
+        }
+
+        .order-item .item-info .item-name {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .order-item .item-info .item-meta {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .order-item .item-price {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #2a2a2a;
+            margin-top: 1rem;
+        }
+
+        .order-footer .order-total {
+            font-size: 1.2rem;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .order-footer .order-payment {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .order-footer .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .order-footer .order-actions button {
+            background: #d4af37;
+            color: #0a0a0a;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .order-footer .order-actions button:hover {
+            background: #f0c45a;
+            transform: scale(1.02);
+        }
+
+        .order-footer .order-actions .cancel-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .order-footer .order-actions .cancel-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Empty State */
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #141414;
+            border-radius: 15px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .empty-orders i {
+            font-size: 4rem;
+            color: #666;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .empty-orders p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .empty-orders a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .empty-orders a:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading */
+        .loading-orders {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .loading-orders .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212,175,55,0.2);
+            border-radius: 50%;
+            border-top-color: #d4af37;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
+        }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #d4af37; color: #0a0a0a; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul { justify-content: center; flex-wrap: wrap; gap: 0.8rem; }
+            .search-li { margin-left: 0; width: 100%; margin-top: 5px; }
+            .search-box { justify-content: center; }
+            .search-box input { width: 180px; }
+            
+            .orders-header h1 { font-size: 1.5rem; }
+            .order-header { flex-direction: column; align-items: flex-start; }
+            .order-footer { flex-direction: column; align-items: flex-start; }
+            .order-item { flex-wrap: wrap; }
+        }
+
+        @media (max-width: 480px) {
+            .order-item img { width: 50px; height: 50px; }
+            .order-item .item-info .item-name { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="img/logo.png" alt="E-Sparkle" onerror="this.src='https://via.placeholder.com/300x100?text=E-SPARKLE'">
+    </div>
+</header>
+
+<div class="navbar">
+    <nav>
+        <ul>
+            <li><b><a href="index.html">Home</a></b></li>
+            <li class="dropdown">
+                <b><a href="#" class="dropdown-toggle">Shop</a></b>
+                <ul class="dropdown-menu">
+                    <li><a href="html 1.htm"><b>Necklaces</b></a></li>
+                    <li><a href="html 1.htm"><b>Rings</b></a></li>
+                    <li><a href="html 1.htm"><b>Earrings</b></a></li>
+                    <li><a href="html2.htm"><b>Bangles</b></a></li>
+                    <li><a href="html2.htm"><b>Watches</b></a></li>
+                </ul>
+            </li>
+            <li><b><a href="contact1.html">Contact</a></b></li>
+            <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+            <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
+            <li style="position: relative;">
+                <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+            </li>
+            <li class="search-li">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search orders...">
+                    <button onclick="searchOrders()"><i class="fas fa-search"></i></button>
+                </div>
+            </li>
+        </ul>
+        <h2><i> Enhance your Elegance with the ultimate Sparkle ✨</i> 💎</h2>
+    </nav>
+</div>
+
+<div class="orders-container">
+    <div class="orders-header">
+        <h1><i class="fas fa-box"></i> My Orders</h1>
+        <a href="html 1.htm" class="back-btn">← Continue Shopping</a>
+    </div>
+
+    <div id="ordersContent">
+        <!-- Orders will be loaded here -->
+    </div>
+</div>
+
+<footer>
+    <div class="footer-container" style="max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; padding: 2rem 2rem 1rem;">
+        <div class="footer-section">
+            <h3 style="color: #d4af37; margin-bottom: 0.8rem; font-size: 1.1rem;">✨ E-Sparkle Jewelry</h3>
+            <p style="color: #bbb; line-height: 1.6; font-size: 0.85rem;">Luxury since 2009</p>
+            <p style="color: #bbb; line-height: 1.6; font-size: 0.85rem;">Premium quality jewelry</p>
+        </div>
+        <div class="footer-section">
+            <h3 style="color: #d4af37; margin-bottom: 0.8rem; font-size: 1.1rem;">Quick Links</h3>
+            <p><a href="index.html" style="color: #bbb; text-decoration: none; line-height: 1.6; font-size: 0.85rem;">Home</a></p>
+            <p><a href="html 1.htm" style="color: #bbb; text-decoration: none; line-height: 1.6; font-size: 0.85rem;">Shop</a></p>
+            <p><a href="contact1.html" style="color: #bbb; text-decoration: none; line-height: 1.6; font-size: 0.85rem;">Contact</a></p>
+            <p><a href="sale.html" style="color: #bbb; text-decoration: none; line-height: 1.6; font-size: 0.85rem;">Sale</a></p>
+        </div>
+        <div class="footer-section">
+            <h3 style="color: #d4af37; margin-bottom: 0.8rem; font-size: 1.1rem;">Contact Us</h3>
+            <p style="color: #bbb; line-height: 1.6; font-size: 0.85rem;"><i class="fas fa-phone"></i> +92 304-7892953</p>
+            <p style="color: #bbb; line-height: 1.6; font-size: 0.85rem;"><i class="fas fa-envelope"></i> E-sparkle2009@gmail.com</p>
+            <p style="color: #bbb; line-height: 1.6; font-size: 0.85rem;"><i class="fas fa-map-marker-alt"></i> Grand Trump Road, Lahore</p>
+        </div>
+        <div class="footer-section">
+            <h3 style="color: #d4af37; margin-bottom: 0.8rem; font-size: 1.1rem;">Follow Us</h3>
+            <div class="social-icons" style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram" style="font-size: 1.3rem; color: #bbb; transition: 0.3s;"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f" style="font-size: 1.3rem; color: #bbb; transition: 0.3s;"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok" style="font-size: 1.3rem; color: #bbb; transition: 0.3s;"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom" style="text-align: center; padding-top: 1.5rem; margin-top: 1.5rem; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.75rem;">
+        <p>&copy; 2024 E-Sparkle Jewelry. All Rights Reserved. | Crafted with ❤️ for elegance</p>
+    </div>
+</footer>
+
+<script>
+// ============================================================
+// API CONFIGURATION
+// ============================================================
+const API_URL = 'http://localhost:5000/api';
+
+// ============================================================
+// LOAD ORDERS
+// ============================================================
+async function loadOrders() {
+    const container = document.getElementById('ordersContent');
+    if (!container) return;
+
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user) {
+        container.innerHTML = `
+            <div class="empty-orders">
+                <i class="fas fa-sign-in-alt"></i>
+                <p>Please login to view your orders.</p>
+                <a href="login.html">Login Now →</a>
+            </div>
+        `;
+        return;
+    }
+
+    // Show loading
+    container.innerHTML = `
+        <div class="loading-orders">
+            <div class="spinner"></div>
+            <p>Loading your orders...</p>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(`${API_URL}/orders/my-orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            const orders = data.orders || [];
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-box-open"></i>
+                        <p>You haven't placed any orders yet.</p>
+                        <a href="html 1.htm">Start Shopping →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            renderOrders(container, orders);
+        } else {
+            throw new Error(data.message || 'Failed to load orders');
+        }
+    } catch (error) {
+        console.error('❌ Error loading orders:', error);
+        container.innerHTML = `
+            <div class="empty-orders">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load orders. Please try again later.</p>
+                <a href="html 1.htm">Continue Shopping</a>
+            </div>
+        `;
+        showNotification('Error loading orders: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// RENDER ORDERS
+// ============================================================
+function renderOrders(container, orders) {
+    let html = '';
+
+    orders.forEach(order => {
+        const statusClass = order.status || 'pending';
+        const statusDisplay = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+        const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A';
+        const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString() : '';
+
+        // Build items HTML
+        let itemsHtml = '';
+        const items = order.items || [];
+        
+        items.forEach(item => {
+            const imageSrc = item.image || 'img/placeholder.jpg';
+            itemsHtml += `
+                <div class="order-item">
+                    <img src="${imageSrc}" alt="${item.name}" onerror="this.src='img/placeholder.jpg'">
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-meta">Qty: ${item.quantity}</div>
+                    </div>
+                    <div class="item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+            `;
+        });
+
+        const totalAmount = order.totalAmount || order.subtotal || 0;
+        const paymentMethod = order.paymentMethod || 'cash_on_delivery';
+        const paymentDisplay = paymentMethod === 'cash_on_delivery' ? 'Cash on Delivery' : 
+                             paymentMethod === 'card' ? 'Card Payment' : 
+                             paymentMethod === 'stripe' ? 'Stripe' : 
+                             paymentMethod === 'bank_transfer' ? 'Bank Transfer' : paymentMethod;
+
+        html += `
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <div class="order-number">📦 #${order.orderNumber || order._id}</div>
+                        <div class="order-date">${orderDate} ${orderTime}</div>
+                    </div>
+                    <div>
+                        <span class="order-status ${statusClass}">${statusDisplay}</span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    ${itemsHtml}
+                </div>
+
+                <div class="order-footer">
+                    <div>
+                        <div class="order-total">Total: $${totalAmount.toFixed(2)}</div>
+                        <div class="order-payment">Payment: ${paymentDisplay}</div>
+                    </div>
+                    <div class="order-actions">
+                        ${order.status !== 'cancelled' && order.status !== 'delivered' ? 
+                            `<button class="cancel-btn" onclick="cancelOrder('${order._id}')">Cancel Order</button>` : 
+                            ''
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// ============================================================
+// CANCEL ORDER
+// ============================================================
+async function cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showNotification('Please login first', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showNotification('Order cancelled successfully!', 'success');
+            loadOrders(); // Refresh orders
+        } else {
+            showNotification(data.message || 'Failed to cancel order', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Cancel order error:', error);
+        showNotification('Error cancelling order: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// SEARCH ORDERS
+// ============================================================
+function searchOrders() {
+    // Simple search - just reload orders (search functionality can be expanded)
+    loadOrders();
+}
+
+// ============================================================
+// UPDATE CART COUNT (Badge)
+// ============================================================
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+    const badge = document.getElementById('cartCount');
+    if (badge) {
+        badge.innerText = count;
+        badge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+}
+
+// ============================================================
+// SHOW NOTIFICATION
+// ============================================================
+function showNotification(message, type) {
+    type = type || 'success';
+    const notification = document.createElement('div');
+    notification.className = 'notification ' + type;
+    notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        if (notification.parentNode) notification.remove();
+    }, 4000);
+}
+
+// ============================================================
+// UPDATE AUTH LINK
+// ============================================================
+function updateAuthLink() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const authLink = document.getElementById('authLink');
+    const authText = document.getElementById('authText');
+    
+    if (authLink && authText) {
+        if (user) {
+            authText.textContent = 'Logout';
+            authLink.href = '#';
+            authLink.style.color = '#e74c3c';
+            authLink.onclick = function(e) {
+                e.preventDefault();
+                if (confirm('Logout?')) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    showNotification('Logged out!', 'info');
+                    setTimeout(() => window.location.href = 'login.html', 1000);
+                }
+            };
+        } else {
+            authText.textContent = 'Login';
+            authLink.href = 'login.html';
+            authLink.style.color = '#d4af37';
+            authLink.onclick = null;
+        }
+    }
+}
+
+// ============================================================
+// DROPDOWN MENU
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Orders page loaded');
+    loadOrders();
+    updateCartCount();
+    updateAuthLink();
+
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.closest('.dropdown').classList.toggle('open');
+        });
+    });
+
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown.open').forEach(drop => {
+            if (!drop.contains(e.target)) drop.classList.remove('open');
+        });
+    });
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchOrders();
+        });
+    }
+});
+</script>
+</body>
+</html>

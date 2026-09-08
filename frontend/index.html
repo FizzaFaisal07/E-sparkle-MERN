@@ -1020,6 +1020,7 @@
     <li><b><a href="contact1.html">Contact</a></b></li>
     <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
     <li><b><a href="orders.html" style="color:#d4af37;">📦 Orders</a></b></li>
+     <li><b><a href="wishlist.html" style="color:#e67e22;">❤️ Wishlist</a></b></li>
     <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
     <li style="position: relative;">
         <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
@@ -1485,6 +1486,145 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start slider auto-play
     startAuto();
 });
+
+// ============================================================
+// WISHLIST API FUNCTIONS
+// ============================================================
+
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+function getHeaders() {
+    const token = getToken();
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+}
+
+// ============================================================
+// ADD TO WISHLIST
+// ============================================================
+async function addToWishlist(productId, name, price, image) {
+    console.log('❤️ Adding to wishlist:', { productId, name, price });
+    
+    const token = getToken();
+    if (!token) {
+        if (confirm('Please login to add items to wishlist. Go to login?')) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/wishlist/add/${productId}`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+
+        const data = await response.json();
+        console.log('📦 Wishlist add response:', data);
+
+        if (data.success) {
+            showNotification(`❤️ ${name} added to wishlist!`, 'success');
+        } else {
+            showNotification(data.message || 'Failed to add to wishlist', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Add to wishlist error:', error);
+        showNotification('Error adding to wishlist', 'error');
+    }
+}
+
+// ============================================================
+// REMOVE FROM WISHLIST
+// ============================================================
+async function removeFromWishlist(productId, name) {
+    console.log('🗑️ Removing from wishlist:', { productId, name });
+    
+    try {
+        const response = await fetch(`${API_URL}/wishlist/remove/${productId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification(`Removed ${name} from wishlist`, 'info');
+        } else {
+            showNotification(data.message || 'Failed to remove', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Remove from wishlist error:', error);
+        showNotification('Error removing from wishlist', 'error');
+    }
+}
+
+// ============================================================
+// TOGGLE WISHLIST
+// ============================================================
+async function toggleWishlist(productId, name, price, image) {
+    console.log('🔄 Toggling wishlist:', { productId, name });
+    
+    const token = getToken();
+    if (!token) {
+        if (confirm('Please login to add items to wishlist. Go to login?')) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+
+    // Check if product is from default (has numeric ID or local_ prefix)
+    const isDefaultProduct = !isNaN(parseInt(productId)) || 
+                             String(productId).startsWith('local_') || 
+                             String(productId).startsWith('p_');
+
+    // For default products, use localStorage fallback
+    if (isDefaultProduct) {
+        console.log('📦 Using localStorage for default product:', productId);
+        toggleLocalWishlist(productId, name, price, image);
+        return;
+    }
+
+    try {
+        // Check if product is in wishlist
+        const checkResponse = await fetch(`${API_URL}/wishlist/check/${productId}`, {
+            headers: getHeaders()
+        });
+        const checkData = await checkResponse.json();
+
+        if (checkData.inWishlist) {
+            await removeFromWishlist(productId, name);
+        } else {
+            await addToWishlist(productId, name, price, image);
+        }
+    } catch (error) {
+        console.error('❌ Toggle wishlist error:', error);
+        // Fallback to localStorage
+        toggleLocalWishlist(productId, name, price, image);
+    }
+}
+
+// ============================================================
+// LOCAL WISHLIST (fallback for default products)
+// ============================================================
+function toggleLocalWishlist(productId, name, price, image) {
+    let wishlist = JSON.parse(localStorage.getItem('localWishlist')) || [];
+    const exists = wishlist.find(item => item.id === productId || item.name === name);
+    
+    if (exists) {
+        wishlist = wishlist.filter(item => item.id !== productId && item.name !== name);
+        showNotification(`Removed ${name} from wishlist`, 'info');
+    } else {
+        wishlist.push({ id: productId, name, price, image });
+        showNotification(`❤️ ${name} added to wishlist`, 'success');
+    }
+    
+    localStorage.setItem('localWishlist', JSON.stringify(wishlist));
+    console.log('📦 Local wishlist updated:', wishlist.length, 'items');
+}
 </script>
 
 </body>

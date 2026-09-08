@@ -462,6 +462,8 @@
             </li>
             <li><b><a href="contact1.html">Contact</a></b></li>
             <li><b><a href="sale.html" style="color:#ffffff;">Sale</a></b></li>
+            <li><b><a href="orders.html" style="color:#d4af37;">📦 Orders</a></b></li>
+            <li><b><a href="wishlist.html" style="color:#e67e22;">❤️ Wishlist</a></b></li>
             <li><b><a href="login.html" id="authLink" style="color: #d4af37; font-weight: 600;"><i class="fas fa-user"></i> <span id="authText">Login</span></a></b></li>
             <li style="position: relative;">
                 <a href="cart.html">🛒 <span id="cartCount" class="cart-badge">0</span></a>
@@ -802,6 +804,114 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+function getHeaders() {
+    const token = getToken();
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+}
+
+// ============================================================
+// ADD TO WISHLIST
+// ============================================================
+async function addToWishlist(productId, name, price, image) {
+    // Check if user is logged in
+    const token = getToken();
+    if (!token) {
+        if (confirm('Please login to add items to wishlist. Go to login?')) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/wishlist/add/${productId}`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification(`❤️ ${name} added to wishlist!`, 'success');
+            // Change heart color to indicate added
+            const btn = event.target.closest('.wishlist-btn');
+            if (btn) {
+                btn.style.color = '#e74c3c';
+                btn.innerHTML = '❤️';
+            }
+        } else {
+            showNotification(data.message || 'Failed to add to wishlist', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Add to wishlist error:', error);
+        showNotification('Error adding to wishlist', 'error');
+    }
+}
+
+// ============================================================
+// REMOVE FROM WISHLIST (for product pages)
+// ============================================================
+async function removeFromWishlist(productId, name) {
+    try {
+        const response = await fetch(`${API_URL}/wishlist/remove/${productId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification(`Removed ${name} from wishlist`, 'info');
+            // Reset heart color
+            const btn = event.target.closest('.wishlist-btn');
+            if (btn) {
+                btn.style.color = '#fff';
+                btn.innerHTML = '❤️';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Remove from wishlist error:', error);
+    }
+}
+
+// ============================================================
+// TOGGLE WISHLIST (check if already in wishlist)
+// ============================================================
+async function toggleWishlist(productId, name, price, image) {
+    const token = getToken();
+    if (!token) {
+        if (confirm('Please login to add items to wishlist. Go to login?')) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+
+    try {
+        // Check if product is in wishlist
+        const checkResponse = await fetch(`${API_URL}/wishlist/check/${productId}`, {
+            headers: getHeaders()
+        });
+        const checkData = await checkResponse.json();
+
+        if (checkData.inWishlist) {
+            // Remove from wishlist
+            await removeFromWishlist(productId, name);
+        } else {
+            // Add to wishlist
+            await addToWishlist(productId, name, price, image);
+        }
+    } catch (error) {
+        console.error('❌ Toggle wishlist error:', error);
+        showNotification('Error updating wishlist', 'error');
+    }
+} 
 </script>
 </body>
 </html>

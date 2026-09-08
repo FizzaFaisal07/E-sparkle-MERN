@@ -1057,7 +1057,6 @@
                     <option value="Sale">Sale</option>
                 </select>
             </div>
-            <!-- NEW: Description field -->
             <div class="form-group">
                 <label>Description</label>
                 <textarea id="productDescription" placeholder="Enter product description" rows="3"></textarea>
@@ -1129,12 +1128,11 @@
     };
 
     // ============================================================
-    // DATA STORE - Keep existing products
+    // DATA STORE
     // ============================================================
     let adminProducts = [];
-    let adminOrders = JSON.parse(localStorage.getItem('adminOrders')) || [];
+    let adminOrders = [];
 
-    // Load products from localStorage (existing products preserved)
     function loadFromStorage() {
         const stored = localStorage.getItem('adminProducts');
         if (stored) {
@@ -1285,7 +1283,7 @@
         document.getElementById('editProductId').value = '';
         document.getElementById('productName').value = '';
         document.getElementById('productPrice').value = '';
-        document.getElementById('productDescription').value = '';  // Reset description
+        document.getElementById('productDescription').value = '';
         document.getElementById('productImage').value = '';
         document.getElementById('productCategory').value = 'Necklaces';
         document.getElementById('productStatus').value = 'active';
@@ -1310,7 +1308,6 @@
     }
 
     function openEditProductModal(id) {
-        // Reload from storage first
         adminProducts = loadFromStorage();
         
         var product = null;
@@ -1332,7 +1329,7 @@
         document.getElementById('editProductId').value = product._id || product.id;
         document.getElementById('productName').value = product.name || '';
         document.getElementById('productPrice').value = product.price || '';
-        document.getElementById('productDescription').value = product.description || '';  // Populate description
+        document.getElementById('productDescription').value = product.description || '';
         document.getElementById('productCategory').value = product.category || 'Necklaces';
         document.getElementById('productStatus').value = product.status || 'active';
         document.getElementById('productStock').value = product.stock || 10;
@@ -1350,17 +1347,15 @@
     }
 
     // ============================================================
-    // RENDER PRODUCTS - Load from MongoDB + Preserve localStorage
+    // RENDER PRODUCTS
     // ============================================================
     async function renderProducts() {
         console.log('🔄 Loading products...');
         
-        // First, load from localStorage (existing products preserved)
         adminProducts = loadFromStorage();
         displayProducts(adminProducts);
         updateDashboard();
         
-        // Then try to sync with MongoDB (add new products, don't remove existing)
         try {
             const token = getToken();
             if (token) {
@@ -1373,36 +1368,25 @@
                     const data = await response.json();
                     if (data.success && data.products) {
                         console.log(`✅ Found ${data.products.length} products in MongoDB`);
-                        
-                        // Merge: Keep existing products, add new ones from MongoDB
                         const apiProducts = data.products || [];
                         const merged = mergeProducts(adminProducts, apiProducts);
-                        
-                        // Save merged products
                         adminProducts = merged;
                         localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
                         displayProducts(adminProducts);
                         updateDashboard();
-                        
                         console.log(`✅ Merged: ${adminProducts.length} total products`);
                     }
                 }
             }
         } catch (error) {
             console.log('⚠️ MongoDB sync error:', error.message);
-            // Keep using localStorage products
         }
     }
 
-    // ============================================================
-    // MERGE PRODUCTS - Preserve existing, add new
-    // ============================================================
     function mergeProducts(localProducts, apiProducts) {
-        // Start with local products
         const merged = [...localProducts];
         
         apiProducts.forEach(apiProduct => {
-            // Check if product already exists (by id, _id, or name)
             const exists = merged.some(p => 
                 p.id === apiProduct.id || 
                 p.id === apiProduct._id ||
@@ -1412,7 +1396,6 @@
             );
             
             if (!exists) {
-                // Add new product from API
                 merged.push({
                     id: apiProduct.id || apiProduct._id,
                     _id: apiProduct._id || apiProduct.id,
@@ -1468,13 +1451,13 @@
     }
 
     // ============================================================
-    // SAVE PRODUCT - Save to MongoDB + Preserve localStorage
+    // SAVE PRODUCT
     // ============================================================
     async function saveProduct() {
         const id = document.getElementById('editProductId').value;
         const name = document.getElementById('productName').value.trim();
         const price = parseFloat(document.getElementById('productPrice').value);
-        const description = document.getElementById('productDescription').value.trim();  // Get description
+        const description = document.getElementById('productDescription').value.trim();
         const category = document.getElementById('productCategory').value;
         const status = document.getElementById('productStatus').value;
         const image = document.getElementById('productImage').value;
@@ -1493,13 +1476,12 @@
             return;
         }
         
-        // Reload latest products from storage
         adminProducts = loadFromStorage();
         
         const productData = { 
             name, 
             price, 
-            description,  // Include description
+            description,
             category, 
             status, 
             image,
@@ -1508,9 +1490,7 @@
         
         console.log('💾 Saving product:', productData);
         
-        // ALWAYS save to localStorage first (preserve existing)
         if (id) {
-            // Edit existing
             let found = false;
             for (let i = 0; i < adminProducts.length; i++) {
                 if (adminProducts[i].id === id || adminProducts[i]._id === id) {
@@ -1520,7 +1500,6 @@
                 }
             }
             if (!found) {
-                // Add as new if not found
                 const newProduct = {
                     id: Date.now(),
                     _id: 'local_' + Date.now(),
@@ -1530,7 +1509,6 @@
                 adminProducts.push(newProduct);
             }
         } else {
-            // Add new product
             const newProduct = {
                 id: Date.now(),
                 _id: 'local_' + Date.now(),
@@ -1540,20 +1518,16 @@
             adminProducts.push(newProduct);
         }
         
-        // Save to localStorage immediately
         localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
         console.log('✅ Saved to localStorage');
         
-        // Show success and refresh display
         showNotification(id ? 'Product updated! ✅' : 'Product added! ✅', 'success');
         closeModal('productModal');
         
-        // Display immediately
         displayProducts(adminProducts);
         updateDashboard();
         syncProductsToStore();
         
-        // THEN try to save to MongoDB (API)
         try {
             const token = getToken();
             if (token) {
@@ -1571,10 +1545,8 @@
                     const data = await response.json();
                     console.log('✅ Synced to MongoDB');
                     
-                    // Update with server ID if new product
                     if (data.product && !id) {
                         const apiProduct = data.product;
-                        // Find the local product and update with server ID
                         for (let i = 0; i < adminProducts.length; i++) {
                             if (adminProducts[i]._id && adminProducts[i]._id.startsWith('local_') && 
                                 adminProducts[i].name === apiProduct.name) {
@@ -1591,15 +1563,13 @@
             }
         } catch (error) {
             console.log('⚠️ MongoDB sync error:', error.message);
-            // Product is already saved locally, so continue
         }
         
-        // Final refresh from MongoDB (adds any new products from other sources)
         await renderProducts();
     }
 
     // ============================================================
-    // DELETE PRODUCT - Delete from MongoDB + localStorage
+    // DELETE PRODUCT
     // ============================================================
     async function deleteProduct(id) {
         if (!confirm('Delete this product?')) return;
@@ -1613,7 +1583,6 @@
         syncProductsToStore();
         showNotification('Product deleted! ✅', 'info');
         
-        // Try to delete from MongoDB
         try {
             const token = getToken();
             if (token) {
@@ -1667,22 +1636,68 @@
     }
 
     // ============================================================
-    // USERS
+    // USERS - SINGLE FUNCTION (No duplicates)
     // ============================================================
     function renderUsers() {
-        var users = JSON.parse(localStorage.getItem('users')) || [];
         var tbody = document.getElementById('usersTableBody');
         var searchTerm = document.getElementById('userSearch') ? document.getElementById('userSearch').value.toLowerCase() : '';
+        
+        var localUsers = JSON.parse(localStorage.getItem('users')) || [];
+        console.log(`📦 Local users: ${localUsers.length}`);
+        
+        fetch(`${API_URL}/users`, {
+            headers: getHeaders()
+        })
+        .then(response => response.json())
+        .then(data => {
+            var allUsers = [...localUsers];
+            
+            if (data.success && data.users) {
+                var apiUsers = data.users || [];
+                console.log(`📦 API users: ${apiUsers.length}`);
+                
+                var localEmails = new Set(localUsers.map(u => u.email));
+                
+                apiUsers.forEach(apiUser => {
+                    if (!localEmails.has(apiUser.email)) {
+                        allUsers.push({
+                            id: apiUser.id || apiUser._id || Date.now(),
+                            name: apiUser.name || 'Unknown',
+                            email: apiUser.email,
+                            role: apiUser.role || 'customer',
+                            phone: apiUser.phone || '',
+                            createdAt: apiUser.createdAt || new Date().toISOString()
+                        });
+                    }
+                });
+            }
+            
+            allUsers.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            
+            displayUsers(allUsers, searchTerm);
+            document.getElementById('userCount').textContent = allUsers.length;
+            document.getElementById('statUsers').textContent = allUsers.length;
+        })
+        .catch(error => {
+            console.warn('⚠️ Error fetching users from API:', error);
+            displayUsers(localUsers, searchTerm);
+            document.getElementById('userCount').textContent = localUsers.length;
+            document.getElementById('statUsers').textContent = localUsers.length;
+        });
+    }
 
+    function displayUsers(users, searchTerm) {
+        var tbody = document.getElementById('usersTableBody');
+        
         var filtered = users;
         if (searchTerm) {
-            filtered = filtered.filter(function(u) {
-                return u.name.toLowerCase().includes(searchTerm) ||
-                       u.email.toLowerCase().includes(searchTerm);
+            filtered = users.filter(function(u) {
+                return (u.name || '').toLowerCase().includes(searchTerm) ||
+                       (u.email || '').toLowerCase().includes(searchTerm);
             });
         }
-
-        document.getElementById('userCount').textContent = users.length;
 
         if (filtered.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-users"></i><p>' + 
@@ -1693,15 +1708,19 @@
 
         var html = '';
         filtered.forEach(function(user, index) {
+            var roleClass = user.role === 'admin' ? 'active' : 'pending';
+            var roleDisplay = user.role || 'user';
+            var createdAt = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+            
             html += '<tr>' +
                 '<td>' + (index + 1) + '</td>' +
-                '<td>' + user.name + '</td>' +
-                '<td>' + user.email + '</td>' +
-                '<td><span class="status-badge ' + (user.role === 'admin' ? 'active' : 'pending') + '">' + (user.role || 'user') + '</span></td>' +
-                '<td>' + (user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A') + '</td>' +
+                '<td>' + (user.name || 'Unknown') + '</td>' +
+                '<td>' + (user.email || 'No email') + '</td>' +
+                '<td><span class="status-badge ' + roleClass + '">' + roleDisplay + '</span></td>' +
+                '<td>' + createdAt + '</td>' +
                 '<td>' +
                     (user.role !== 'admin' ? 
-                        '<button class="action-btn delete" onclick="deleteUser(' + user.id + ')"><i class="fas fa-trash"></i></button>' : 
+                        '<button class="action-btn delete" onclick="deleteUser(\'' + (user.id || user._id) + '\')"><i class="fas fa-trash"></i></button>' : 
                         '<span style="color: #888; font-size: 0.7rem;">Protected</span>') +
                 '</td>' +
             '</tr>';
@@ -1715,9 +1734,25 @@
 
     function deleteUser(id) {
         if (!confirm('Are you sure you want to delete this user?')) return;
+        
         var users = JSON.parse(localStorage.getItem('users')) || [];
-        users = users.filter(function(u) { return u.id !== id; });
+        users = users.filter(function(u) { return u.id !== id && u._id !== id; });
         localStorage.setItem('users', JSON.stringify(users));
+        
+        fetch(`${API_URL}/users/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('User deleted from database!', 'info');
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Could not delete from API:', error);
+        });
+        
         renderUsers();
         updateDashboard();
         showNotification('User deleted!', 'info');
@@ -1730,14 +1765,13 @@
         var tbody = document.getElementById('ordersTableBody');
         var searchTerm = document.getElementById('orderSearch') ? document.getElementById('orderSearch').value.toLowerCase() : '';
 
-        // Fetch orders from API
         fetch(`${API_URL}/orders`, {
             headers: getHeaders()
         })
         .then(response => response.json())
         .then(data => {
             const orders = data.orders || [];
-            adminOrders = orders; // update local copy
+            adminOrders = orders;
             document.getElementById('orderCount').textContent = orders.length;
 
             let filtered = orders;
@@ -1835,11 +1869,41 @@
     // ============================================================
     function updateDashboard() {
         adminProducts = loadFromStorage();
-        var users = JSON.parse(localStorage.getItem('users')) || [];
-        document.getElementById('statUsers').textContent = users.length;
         document.getElementById('statProducts').textContent = adminProducts.length;
         
-        // Get order stats from API
+        fetch(`${API_URL}/users`, {
+            headers: getHeaders()
+        })
+        .then(response => response.json())
+        .then(data => {
+            var userCount = 0;
+            if (data.success && data.users) {
+                userCount = data.users.length;
+            }
+            
+            var localUsers = JSON.parse(localStorage.getItem('users')) || [];
+            var extraUsers = 0;
+            if (data.success && data.users) {
+                var apiEmails = new Set(data.users.map(u => u.email));
+                localUsers.forEach(u => {
+                    if (!apiEmails.has(u.email)) {
+                        extraUsers++;
+                    }
+                });
+            }
+            
+            var totalUsers = userCount + extraUsers;
+            document.getElementById('statUsers').textContent = totalUsers;
+            document.getElementById('userCount').textContent = totalUsers;
+            console.log(`📊 Total users: ${totalUsers} (API: ${userCount}, Local extra: ${extraUsers})`);
+        })
+        .catch(error => {
+            console.warn('⚠️ Error fetching users for dashboard:', error);
+            var users = JSON.parse(localStorage.getItem('users')) || [];
+            document.getElementById('statUsers').textContent = users.length;
+            document.getElementById('userCount').textContent = users.length;
+        });
+        
         fetch(`${API_URL}/orders/stats/overview`, {
             headers: getHeaders()
         })
@@ -1848,13 +1912,15 @@
             if (data.success && data.stats) {
                 document.getElementById('statOrders').textContent = data.stats.totalOrders || 0;
                 document.getElementById('statRevenue').textContent = '$' + (data.stats.totalRevenue || 0).toFixed(2);
+                document.getElementById('orderCount').textContent = data.stats.totalOrders || 0;
             }
         })
         .catch(() => {
-            // fallback: use local orders count
-            document.getElementById('statOrders').textContent = adminOrders.length;
-            var revenue = adminOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+            var orders = JSON.parse(localStorage.getItem('adminOrders')) || [];
+            document.getElementById('statOrders').textContent = orders.length;
+            var revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
             document.getElementById('statRevenue').textContent = '$' + revenue.toFixed(2);
+            document.getElementById('orderCount').textContent = orders.length;
         });
     }
 
@@ -1919,20 +1985,17 @@
 
     // ============================================================
     // LOAD SAMPLE ORDERS
-function loadSampleOrders() {
-    adminOrders = JSON.parse(localStorage.getItem('adminOrders')) || [];
-    // No sample orders - wait for real orders
-    console.log('📦 No sample orders. Orders will appear after checkout.');
-}
+    function loadSampleOrders() {
+        adminOrders = JSON.parse(localStorage.getItem('adminOrders')) || [];
+        console.log('📦 No sample orders. Orders will appear after checkout.');
+    }
 
     // ============================================================
-    // LOAD SAMPLE PRODUCTS - Only if none exist
-    // ============================================================
-function loadSampleProducts() {
-    adminProducts = loadFromStorage();
-    // Do nothing - let user add products manually
-    console.log('📦 No sample products loaded. Add products from admin panel.');
-}
+    // LOAD SAMPLE PRODUCTS
+    function loadSampleProducts() {
+        adminProducts = loadFromStorage();
+        console.log('📦 No sample products loaded. Add products from admin panel.');
+    }
 
     // ============================================================
     // INIT
@@ -1940,8 +2003,6 @@ function loadSampleProducts() {
     document.addEventListener('DOMContentLoaded', function() {
         if (!checkAdminAccess()) return;
 
-        //loadSampleOrders();
-        //loadSampleProducts();
         loadSettings();
         
         adminProducts = loadFromStorage();
@@ -1950,7 +2011,6 @@ function loadSampleProducts() {
         renderUsers();
         renderOrders();
 
-        // Enter key support for search
         var productSearch = document.getElementById('productSearch');
         if (productSearch) {
             productSearch.addEventListener('keypress', function(e) {

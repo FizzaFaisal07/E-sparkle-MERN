@@ -44,33 +44,10 @@ const ReviewSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Ensure one review per user per product
+// Indexes
 ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
 ReviewSchema.index({ product: 1 });
 ReviewSchema.index({ user: 1 });
 
-// Static method to calculate average rating
-ReviewSchema.statics.getAverageRating = async function(productId) {
-    const result = await this.aggregate([
-        {
-            $match: { product: productId }
-        },
-        {
-            $group: {
-                _id: '$product',
-                averageRating: { $avg: '$rating' },
-                reviewCount: { $sum: 1 }
-            }
-        }
-    ]);
-    
-    return result.length > 0 ? {
-        averageRating: Math.round(result[0].averageRating * 10) / 10,
-        reviewCount: result[0].reviewCount
-    } : {
-        averageRating: 0,
-        reviewCount: 0
-    };
-};
-
+// Check if model exists before creating
 module.exports = mongoose.models.Review || mongoose.model('Review', ReviewSchema);

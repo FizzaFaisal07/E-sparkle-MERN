@@ -15,7 +15,6 @@ const userRoutes = require('./routes/users');
 const cartRoutes = require('./routes/cart');
 const wishlistRoutes = require('./routes/wishlist');
 const reviewRoutes = require('./routes/reviews');
-
 // Import middleware
 const { errorHandler } = require('./middleware/errorHandler');
 const corsConfig = require('./config/cors');

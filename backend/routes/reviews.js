@@ -3,11 +3,11 @@ const router = express.Router();
 const reviewController = require('../controllers/reviewController');
 const { verifyToken } = require('../middleware/auth');
 
-// Public routes
+// ========== PUBLIC ROUTES ==========
 router.get('/product/:productId', reviewController.getProductReviews);
 router.get('/product/:productId/rating', reviewController.getProductRating);
 
-// Protected routes
+// ========== PROTECTED ROUTES ==========
 router.post('/:productId', verifyToken, reviewController.createReview);
 router.put('/:reviewId', verifyToken, reviewController.updateReview);
 router.delete('/:reviewId', verifyToken, reviewController.deleteReview);

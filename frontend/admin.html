@@ -789,6 +789,32 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #d4af37;
         }
+
+        /* ===== REVIEWS ===== */
+.rating-stars {
+    color: #d4af37;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.review-comment {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #bbb;
+    font-size: 0.85rem;
+}
+
+.review-comment:hover {
+    white-space: normal;
+    overflow: visible;
+    background: #1a1a1a;
+    padding: 5px 10px;
+    border-radius: 8px;
+    position: relative;
+    z-index: 10;
+}
     </style>
 </head>
 <body>
@@ -809,25 +835,30 @@
     <div class="admin-dashboard">
         <!-- Sidebar -->
         <nav class="admin-sidebar">
-            <div class="menu-item active" onclick="showSection('dashboard', this)">
-                <i class="fas fa-chart-pie"></i> Dashboard
-            </div>
-            <div class="menu-item" onclick="showSection('products', this)">
-                <i class="fas fa-gem"></i> Products
-                <span class="badge" id="productCount">0</span>
-            </div>
-            <div class="menu-item" onclick="showSection('users', this)">
-                <i class="fas fa-users"></i> Users
-                <span class="badge" id="userCount">0</span>
-            </div>
-            <div class="menu-item" onclick="showSection('orders', this)">
-                <i class="fas fa-shopping-cart"></i> Orders
-                <span class="badge" id="orderCount">0</span>
-            </div>
-            <div class="menu-item" onclick="showSection('settings', this)">
-                <i class="fas fa-cog"></i> Settings
-            </div>
-        </nav>
+    <div class="menu-item active" onclick="showSection('dashboard', this)">
+        <i class="fas fa-chart-pie"></i> Dashboard
+    </div>
+    <div class="menu-item" onclick="showSection('products', this)">
+        <i class="fas fa-gem"></i> Products
+        <span class="badge" id="productCount">0</span>
+    </div>
+    <div class="menu-item" onclick="showSection('users', this)">
+        <i class="fas fa-users"></i> Users
+        <span class="badge" id="userCount">0</span>
+    </div>
+    <div class="menu-item" onclick="showSection('orders', this)">
+        <i class="fas fa-shopping-cart"></i> Orders
+        <span class="badge" id="orderCount">0</span>
+    </div>
+    <!-- ✅ ADD THIS -->
+    <div class="menu-item" onclick="showSection('reviews', this)">
+        <i class="fas fa-star"></i> Reviews
+        <span class="badge" id="reviewCount">0</span>
+    </div>
+    <div class="menu-item" onclick="showSection('settings', this)">
+        <i class="fas fa-cog"></i> Settings
+    </div>
+</nav>
 
         <!-- ===== MAIN CONTENT ===== -->
         <main class="admin-main">
@@ -979,6 +1010,39 @@
                 </div>
             </section>
 
+            <!-- ===== REVIEWS SECTION ===== -->
+<section id="section-reviews" class="section">
+    <div class="table-container">
+        <div class="table-header">
+            <h2><i class="fas fa-star"></i> Customer Reviews</h2>
+            <div class="search-box">
+                <input type="text" id="reviewSearch" placeholder="Search reviews...">
+                <button onclick="searchReviews()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>User</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="reviewsTableBody">
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <i class="fas fa-star"></i>
+                        <p>No reviews yet</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
             <!-- ===== SETTINGS SECTION ===== -->
             <section id="section-settings" class="section">
                 <div class="table-container" style="padding: 2rem;">
@@ -2032,6 +2096,8 @@
             });
         }
     });
+
+    
     </script>
 </body>
 </html>

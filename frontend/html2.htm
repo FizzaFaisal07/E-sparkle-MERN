@@ -73,6 +73,9 @@
         position: absolute;
         top: -8px;
         right: -12px;
+        min-width: 18px;
+        text-align: center;
+        display: none;
     }
 
     /* Dropdown */
@@ -327,6 +330,7 @@
         animation: slideIn 0.3s ease;
         font-size: 0.85rem;
         box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        max-width: 400px;
     }
     .notification.success { background: #27ae60; }
     .notification.error { background: #e74c3c; }
@@ -476,129 +480,32 @@
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
 
 <script>
-
-    // ============================================
-// API CONFIGURATION - For All Pages
-// ============================================
-const API_URL = 'http://localhost:5000/api';
-
-// Get token from localStorage
-const getToken = () => localStorage.getItem('token');
-
-// API Headers
-const getHeaders = () => {
-    const token = getToken();
-    return {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
-    };
-};
-
-// Handle API response
-const handleResponse = async (response) => {
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error(data.message || 'Request failed');
-    }
-    return data;
-};
-
-// ============================================
-// PRODUCT API
-// ============================================
-async function loadProductsFromAPI() {
-    try {
-        const response = await fetch(`${API_URL}/products`);
-        const data = await handleResponse(response);
-        return data.products;
-    } catch (error) {
-        console.error('Error loading products:', error);
-        return [];
-    }
-}
-
-// ============================================
-// CART API
-// ============================================
-async function addToCartAPI(productId, quantity = 1) {
-    try {
-        const token = getToken();
-        if (!token) {
-            // Fallback to localStorage
-            addToCartLocal(productId, quantity);
-            return;
-        }
-        
-        const response = await fetch(`${API_URL}/cart/add`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ productId, quantity })
-        });
-        return await handleResponse(response);
-    } catch (error) {
-        console.error('Add to cart error:', error);
-        // Fallback to localStorage
-        addToCartLocal(productId, quantity);
-    }
-}
-
-// ============================================
-// AUTH API
-// ============================================
-async function loginAPI(email, password) {
-    const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    });
-    return handleResponse(response);
-}
-
-async function registerAPI(userData) {
-    const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-    });
-    return handleResponse(response);
-}
-
-// ============================================
-// FALLBACK: localStorage cart
-// ============================================
-function addToCartLocal(name, price, image) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let existing = cart.find(item => item.name === name);
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({ id: Date.now(), name, price, image, quantity: 1 });
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
-    showNotification(`${name} added to cart!`, 'success');
-}
+    // ============================================================
+    // API CONFIGURATION
+    // ============================================================
+    const API_URL = 'http://localhost:5000/api';
 
     // ============================================================
-    // DEFAULT PRODUCTS (Hardcoded - Preserved)
+    // INLINE SVG PLACEHOLDER
+    // ============================================================
+    const PLACEHOLDER_SVG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IiMxNDE0MTQiLz48dGV4dCB4PSI0MCIgeT0iNDAiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+
+    // ============================================================
+    // DEFAULT PRODUCTS (Always keep these)
     // ============================================================
     var defaultProducts = [
-        // Bangles - Row 1
         { id: 101, name: 'Gold Bangles', price: 100, image: 'img/b1.webp', category: 'Bangles' },
         { id: 102, name: 'Silver Bangles', price: 95, image: 'img/b2.webp', category: 'Bangles' },
         { id: 103, name: 'Gold Bangles 2', price: 150, image: 'img/b3.avif', category: 'Bangles' },
         { id: 104, name: 'Gold Bracelet', price: 95, image: 'img/b4.webp', category: 'Bangles' },
-        // Bangles - Row 2
         { id: 105, name: 'Luna Bracelet', price: 160, image: 'img/b5.jpg', category: 'Bangles' },
         { id: 106, name: 'Silver Bracelet', price: 120, image: 'img/b6.jpg', category: 'Bangles' },
         { id: 107, name: 'Gold Bangles 3', price: 98, image: 'img/b7.webp', category: 'Bangles' },
         { id: 108, name: 'Lyra Bracelet', price: 79, image: 'img/b8.avif', category: 'Bangles' },
-        // Watches - Row 1
         { id: 109, name: 'Black Wrist Watch', price: 23, image: 'img/w1.webp', category: 'Watches' },
         { id: 110, name: 'Golden Wrist Watch', price: 99, image: 'img/w2.webp', category: 'Watches' },
         { id: 111, name: 'Fancy Wrist Watch', price: 110, image: 'img/w3.jpg', category: 'Watches' },
         { id: 112, name: 'Silver Wrist Watch', price: 86, image: 'img/w4.webp', category: 'Watches' },
-        // Watches - Row 2
         { id: 113, name: 'Golden Wrist Watch 2', price: 99, image: 'img/w5.webp', category: 'Watches' },
         { id: 114, name: 'Wrist Watch', price: 100, image: 'img/w6.jpg', category: 'Watches' },
         { id: 115, name: 'Rosegold Watch', price: 55, image: 'img/w7.webp', category: 'Watches' }
@@ -609,70 +516,142 @@ function addToCartLocal(name, price, image) {
     var currentFilterMax = 10000;
 
     // ============================================================
-    // LOAD PRODUCTS - Merge Default + Admin Products
+    // LOAD PRODUCTS - FIXED: Keep defaults, prevent duplicates, fix image loading
     // ============================================================
-    function loadProducts() {
-        var adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
-        var storeProducts = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    async function loadProducts() {
+        console.log('📦 Loading Bangles & Watches...');
         
-        allProducts = JSON.parse(JSON.stringify(defaultProducts));
+        // Use a Map to track unique products by name+category
+        var productMap = new Map();
         
-        // Merge admin products
-        if (adminProducts.length > 0) {
+        // Helper function to add product to map (prevents duplicates)
+        function addProductToMap(product, source) {
+            // Create a unique key based on name and category (case insensitive)
+            var key = (product.name || '').trim().toLowerCase() + '_' + (product.category || '').trim().toLowerCase();
+            
+            // Get the image - ensure it's properly set
+            var imageSrc = PLACEHOLDER_SVG;
+            if (product.image && product.image.trim() !== '' && product.image !== 'undefined' && product.image !== 'null') {
+                imageSrc = product.image;
+            }
+            
+            // If product already exists, check if we should update it
+            if (productMap.has(key)) {
+                var existing = productMap.get(key);
+                // Update if new product has a valid image and existing doesn't, OR if source is API (highest priority)
+                var shouldUpdate = false;
+                
+                // If source is API, always update (highest priority)
+                if (source === 'API') {
+                    shouldUpdate = true;
+                }
+                // If new has valid image and existing doesn't
+                else if (imageSrc !== PLACEHOLDER_SVG && existing.image === PLACEHOLDER_SVG) {
+                    shouldUpdate = true;
+                }
+                // If new price is different (maybe updated)
+                else if (product.price && product.price !== existing.price) {
+                    shouldUpdate = true;
+                }
+                
+                if (shouldUpdate) {
+                    productMap.set(key, {
+                        id: product.id || Date.now(),
+                        name: product.name,
+                        price: product.price || 0,
+                        image: imageSrc,
+                        category: product.category
+                    });
+                    console.log(`🔄 Updated: ${product.name} from ${source} with image: ${imageSrc.substring(0, 50)}...`);
+                }
+                return;
+            }
+            
+            // Add new product
+            productMap.set(key, {
+                id: product.id || Date.now() + Math.random() * 1000,
+                name: product.name,
+                price: product.price || 0,
+                image: imageSrc,
+                category: product.category
+            });
+            console.log(`✅ Added: ${product.name} (${product.category}) from ${source} with image: ${imageSrc.substring(0, 50)}...`);
+        }
+        
+        // ============================================================
+        // STEP 1: ALWAYS add default products first (lowest priority)
+        // ============================================================
+        console.log('📦 Adding default products...');
+        defaultProducts.forEach(function(product) {
+            addProductToMap(product, 'default');
+        });
+        
+        // ============================================================
+        // STEP 2: Load from Admin Products (localStorage)
+        // ============================================================
+        try {
+            var adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
+            console.log(`📦 Admin products found: ${adminProducts.length}`);
+            
             adminProducts.forEach(function(adminProduct) {
-                var existingIndex = allProducts.findIndex(function(p) { 
-                    return p.id === adminProduct.id || p.name === adminProduct.name;
-                });
-                
-                if (existingIndex !== -1) {
-                    allProducts[existingIndex] = {
-                        id: adminProduct.id,
-                        name: adminProduct.name,
-                        price: adminProduct.price,
-                        image: adminProduct.image || allProducts[existingIndex].image,
-                        category: adminProduct.category || allProducts[existingIndex].category
-                    };
-                } else {
-                    allProducts.push({
-                        id: adminProduct.id,
-                        name: adminProduct.name,
-                        price: adminProduct.price,
-                        image: adminProduct.image || 'img/placeholder.jpg',
-                        category: adminProduct.category || 'General'
-                    });
+                if (adminProduct.category === 'Bangles' || adminProduct.category === 'Watches') {
+                    addProductToMap(adminProduct, 'admin');
                 }
             });
+        } catch (e) {
+            console.warn('⚠️ Error loading admin products:', e);
         }
         
-        // Merge store products
-        if (storeProducts.length > 0) {
+        // ============================================================
+        // STEP 3: Load from Store Products (localStorage)
+        // ============================================================
+        try {
+            var storeProducts = JSON.parse(localStorage.getItem('storeProducts')) || [];
+            console.log(`📦 Store products found: ${storeProducts.length}`);
+            
             storeProducts.forEach(function(storeProduct) {
-                var existingIndex = allProducts.findIndex(function(p) { 
-                    return p.id === storeProduct.id;
-                });
-                
-                if (existingIndex !== -1) {
-                    allProducts[existingIndex] = {
-                        id: storeProduct.id,
-                        name: storeProduct.name,
-                        price: storeProduct.price,
-                        image: storeProduct.image || allProducts[existingIndex].image,
-                        category: storeProduct.category || allProducts[existingIndex].category
-                    };
-                } else {
-                    allProducts.push({
-                        id: storeProduct.id,
-                        name: storeProduct.name,
-                        price: storeProduct.price,
-                        image: storeProduct.image || 'img/placeholder.jpg',
-                        category: storeProduct.category || 'General'
-                    });
+                if (storeProduct.category === 'Bangles' || storeProduct.category === 'Watches') {
+                    addProductToMap(storeProduct, 'store');
                 }
             });
+        } catch (e) {
+            console.warn('⚠️ Error loading store products:', e);
         }
         
+        // ============================================================
+        // STEP 4: Load from API (MongoDB) - Highest priority
+        // ============================================================
+        try {
+            console.log('🔄 Fetching from API...');
+            const response = await fetch(`${API_URL}/products`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.products && data.products.length > 0) {
+                    console.log(`✅ API returned ${data.products.length} products`);
+                    
+                    data.products.forEach(function(apiProduct) {
+                        if (apiProduct.category === 'Bangles' || apiProduct.category === 'Watches') {
+                            // API products override existing ones (they have the latest data)
+                            addProductToMap(apiProduct, 'API');
+                        }
+                    });
+                }
+            } else {
+                console.warn('⚠️ API returned status:', response.status);
+            }
+        } catch (error) {
+            console.warn('⚠️ API fetch failed:', error.message);
+        }
+        
+        // Convert map to array
+        allProducts = Array.from(productMap.values());
+        console.log(`📊 Total unique products loaded: ${allProducts.length}`);
+        console.log(`📊 Products: ${allProducts.map(p => p.name + ' (img: ' + (p.image ? 'yes' : 'no') + ')').join(', ')}`);
+        
+        // Save merged products to localStorage
         localStorage.setItem('allProducts', JSON.stringify(allProducts));
         
+        // Render all products
         renderAllProducts();
         return allProducts;
     }
@@ -681,48 +660,134 @@ function addToCartLocal(name, price, image) {
     // RENDER ALL PRODUCTS
     // ============================================================
     function renderAllProducts() {
-        var banglesProducts = allProducts.filter(function(p) { return p.category === 'Bangles'; });
-        var watchesProducts = allProducts.filter(function(p) { return p.category === 'Watches'; });
+        // Filter products by category
+        var banglesProducts = allProducts.filter(function(p) { 
+            return p.category === 'Bangles'; 
+        });
         
-        // Split Bangles into 2 rows (4 per row)
-        renderCategoryProducts('banglesRow', banglesProducts.slice(0, 4));
-        renderCategoryProducts('banglesRow2', banglesProducts.slice(4, 8));
+        var watchesProducts = allProducts.filter(function(p) { 
+            return p.category === 'Watches'; 
+        });
         
-        // Split Watches into 2 rows (4 per row)
-        renderCategoryProducts('watchesRow', watchesProducts.slice(0, 4));
-        renderCategoryProducts('watchesRow2', watchesProducts.slice(4, 8));
+        console.log(`📊 Bangles: ${banglesProducts.length}, Watches: ${watchesProducts.length}`);
+        
+        // Render Bangles
+        renderCategoryWithRows('banglesRow', 'banglesRow2', banglesProducts);
+        
+        // Render Watches
+        renderCategoryWithRows('watchesRow', 'watchesRow2', watchesProducts);
     }
 
     // ============================================================
-    // RENDER PRODUCTS IN A ROW
+    // RENDER CATEGORY WITH ROWS (4 per row)
     // ============================================================
-    function renderCategoryProducts(rowId, products) {
-        var row = document.getElementById(rowId);
-        if (!row) return;
+    function renderCategoryWithRows(row1Id, row2Id, products) {
+        var row1 = document.getElementById(row1Id);
+        var row2 = document.getElementById(row2Id);
+        
+        if (!row1 || !row2) return;
+        
+        // Clear both rows
+        row1.innerHTML = '';
+        row2.innerHTML = '';
         
         if (!products || products.length === 0) {
-            row.innerHTML = '<div style="text-align:center; padding:2rem; color:#666; width:100%;">No products in this category yet</div>';
+            var emptyMessage = `
+                <div style="text-align:center; padding:2rem; color:#666; width:100%; grid-column: 1 / -1;">
+                    <i class="fas fa-box-open" style="font-size:2rem; display:block; margin-bottom:1rem;"></i>
+                    No products in this category yet
+                </div>
+            `;
+            row1.innerHTML = emptyMessage;
             return;
         }
         
+        // Split products into rows of 4
+        var itemsPerRow = 4;
+        var firstRowItems = products.slice(0, itemsPerRow);
+        var secondRowItems = products.slice(itemsPerRow);
+        
+        // Render first row
+        renderProductItems(row1, firstRowItems);
+        
+        // Render second row (if any)
+        if (secondRowItems.length > 0) {
+            renderProductItems(row2, secondRowItems);
+        } else {
+            row2.innerHTML = `
+                <div style="text-align:center; padding:1.5rem; color:#444; width:100%; grid-column: 1 / -1; font-size: 0.8rem;">
+                    <i class="fas fa-box" style="font-size:1.2rem; display:block; margin-bottom:0.5rem;"></i>
+                    More products coming soon...
+                </div>
+            `;
+        }
+    }
+
+    // ============================================================
+    // RENDER PRODUCT ITEMS - FIXED: Better image handling
+    // ============================================================
+    function renderProductItems(container, products) {
         var html = '';
         products.forEach(function(product) {
-            var imageSrc = product.image && product.image.startsWith('data:image') ? 
-                product.image : 
-                (product.image || 'img/placeholder.jpg');
+            var imageSrc = PLACEHOLDER_SVG;
+            
+            // Check if product has a valid image
+            if (product.image && product.image.trim() !== '' && product.image !== 'undefined' && product.image !== 'null') {
+                imageSrc = product.image;
+            }
+            
+            // Log image info for debugging
+            console.log(`🖼️ Rendering ${product.name}: image = ${imageSrc.substring(0, 60)}...`);
             
             html += `
                 <div class="item" data-name="${product.name}" data-price="${product.price}" data-category="${product.category}">
                     <button class="wishlist-btn" onclick="toggleWishlist('${product.name}', ${product.price}, '${imageSrc}')">❤️</button>
-                    <img src="${imageSrc}" alt="${product.name}" onerror="this.src='img/placeholder.jpg'">
+                    <img src="${imageSrc}" alt="${product.name}" onerror="this.onerror=null; this.src='${PLACEHOLDER_SVG}'">
                     <p class="name"><b>${product.name}</b></p>
-                    <p class="price"><b>$${product.price.toFixed(2)}</b></p>
-                    <button class="cart-button" onclick="addToCart('${product.name}', ${product.price}, '${imageSrc}')">Add to Cart</button>
+                    <p class="price"><b>$${parseFloat(product.price || 0).toFixed(2)}</b></p>
+                    <button class="cart-button" onclick="addToCart('${product.name}', ${product.price || 0}, '${imageSrc}')">Add to Cart</button>
                 </div>
             `;
         });
         
-        row.innerHTML = html;
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // CART FUNCTIONALITY
+    // ============================================================
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCartCount() {
+        var count = cart.reduce(function(total, item) { return total + (item.quantity || 1); }, 0);
+        var cartBadge = document.getElementById('cartCount');
+        if (cartBadge) {
+            cartBadge.innerText = count;
+            cartBadge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+    }
+
+    function addToCart(name, price, image) {
+        var existingItem = cart.find(function(item) { return item.name === name; });
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            cart.push({ id: Date.now(), name: name, price: parseFloat(price), image: image || PLACEHOLDER_SVG, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification(name + ' added to cart! 🛒', 'success');
+    }
+
+    function showNotification(message, type) {
+        type = type || 'success';
+        var notification = document.createElement('div');
+        notification.className = 'notification ' + type;
+        notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
+        document.body.appendChild(notification);
+        setTimeout(function() {
+            if (notification.parentNode) notification.remove();
+        }, 3000);
     }
 
     // ============================================================
@@ -753,88 +818,35 @@ function addToCartLocal(name, price, image) {
     }
 
     // ============================================================
-    // SORT PRODUCTS - FIXED: Sorts within each category separately
+    // SORT PRODUCTS
     // ============================================================
     function sortProducts(order) {
-        // Get all rows
-        var banglesRow1 = document.getElementById('banglesRow');
-        var banglesRow2 = document.getElementById('banglesRow2');
-        var watchesRow1 = document.getElementById('watchesRow');
-        var watchesRow2 = document.getElementById('watchesRow2');
+        var rows = ['banglesRow', 'banglesRow2', 'watchesRow', 'watchesRow2'];
         
-        // Get all items from each category
-        var banglesItems = [];
-        if (banglesRow1) {
-            var items1 = Array.from(banglesRow1.querySelectorAll('.item'));
-            banglesItems = banglesItems.concat(items1);
-        }
-        if (banglesRow2) {
-            var items2 = Array.from(banglesRow2.querySelectorAll('.item'));
-            banglesItems = banglesItems.concat(items2);
-        }
-        
-        var watchesItems = [];
-        if (watchesRow1) {
-            var items3 = Array.from(watchesRow1.querySelectorAll('.item'));
-            watchesItems = watchesItems.concat(items3);
-        }
-        if (watchesRow2) {
-            var items4 = Array.from(watchesRow2.querySelectorAll('.item'));
-            watchesItems = watchesItems.concat(items4);
-        }
-        
-        // Sort Bangles by price
-        banglesItems.sort(function(a, b) {
-            var priceA = parseFloat(a.getAttribute('data-price'));
-            var priceB = parseFloat(b.getAttribute('data-price'));
-            return order === 'asc' ? priceA - priceB : priceB - priceA;
+        rows.forEach(function(rowId) {
+            var row = document.getElementById(rowId);
+            if (!row) return;
+            
+            var items = Array.from(row.querySelectorAll('.item'));
+            if (items.length === 0) return;
+            
+            items.sort(function(a, b) {
+                var priceA = parseFloat(a.getAttribute('data-price'));
+                var priceB = parseFloat(b.getAttribute('data-price'));
+                return order === 'asc' ? priceA - priceB : priceB - priceA;
+            });
+            
+            row.innerHTML = '';
+            items.forEach(function(item) { row.appendChild(item); });
         });
         
-        // Sort Watches by price
-        watchesItems.sort(function(a, b) {
-            var priceA = parseFloat(a.getAttribute('data-price'));
-            var priceB = parseFloat(b.getAttribute('data-price'));
-            return order === 'asc' ? priceA - priceB : priceB - priceA;
-        });
-        
-        // Clear Bangles rows
-        if (banglesRow1) banglesRow1.innerHTML = '';
-        if (banglesRow2) banglesRow2.innerHTML = '';
-        
-        // Clear Watches rows
-        if (watchesRow1) watchesRow1.innerHTML = '';
-        if (watchesRow2) watchesRow2.innerHTML = '';
-        
-        // Redistribute Bangles (4 per row)
-        var itemsPerRow = 4;
-        banglesItems.forEach(function(item, index) {
-            if (index < itemsPerRow) {
-                if (banglesRow1) banglesRow1.appendChild(item);
-            } else {
-                if (banglesRow2) banglesRow2.appendChild(item);
-            }
-        });
-        
-        // Redistribute Watches (4 per row)
-        watchesItems.forEach(function(item, index) {
-            if (index < itemsPerRow) {
-                if (watchesRow1) watchesRow1.appendChild(item);
-            } else {
-                if (watchesRow2) watchesRow2.appendChild(item);
-            }
-        });
-        
-        // Re-apply filter after sort
         if (currentFilterMin !== 0 || currentFilterMax !== 10000) {
             applyFilter(currentFilterMin, currentFilterMax);
         }
         
-        showNotification('Sorted by price: ' + (order === 'asc' ? 'Low to High' : 'High to Low'), 'info');
+        showNotification('Sorted: ' + (order === 'asc' ? 'Low to High' : 'High to Low'), 'info');
     }
 
-    // ============================================================
-    // APPLY FILTER (Helper function)
-    // ============================================================
     function applyFilter(min, max) {
         var allItems = document.querySelectorAll('.item');
         allItems.forEach(function(item) {
@@ -847,9 +859,6 @@ function addToCartLocal(name, price, image) {
         });
     }
 
-    // ============================================================
-    // CLEAR FILTERS
-    // ============================================================
     function clearFilters() {
         currentFilterMin = 0;
         currentFilterMax = 10000;
@@ -868,40 +877,6 @@ function addToCartLocal(name, price, image) {
         });
         
         showNotification('All filters cleared!', 'info');
-    }
-
-    // ============================================================
-    // CART FUNCTIONALITY
-    // ============================================================
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    function updateCartCount() {
-        var count = cart.reduce(function(total, item) { return total + item.quantity; }, 0);
-        var cartBadge = document.getElementById('cartCount');
-        if (cartBadge) cartBadge.innerText = count;
-    }
-
-    function addToCart(name, price, image) {
-        var existingItem = cart.find(function(item) { return item.name === name; });
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            cart.push({ id: Date.now(), name: name, price: price, image: image, quantity: 1 });
-        }
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
-        showNotification(name + ' added to cart!', 'success');
-    }
-
-    function showNotification(message, type) {
-        type = type || 'success';
-        var notification = document.createElement('div');
-        notification.className = 'notification ' + type;
-        notification.innerHTML = '<span>✨ ' + message + ' ✨</span>';
-        document.body.appendChild(notification);
-        setTimeout(function() {
-            notification.remove();
-        }, 3000);
     }
 
     // ============================================================
@@ -974,7 +949,7 @@ function addToCartLocal(name, price, image) {
     });
 
     // ============================================================
-    // UPDATE AUTH LINK (Login/Logout)
+    // UPDATE AUTH LINK
     // ============================================================
     function updateAuthLink() {
         var currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -1009,6 +984,7 @@ function addToCartLocal(name, price, image) {
     // DROPDOWN MENU
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 E-Sparkle Bangles & Watches Page Loaded');
         loadProducts();
         updateCartCount();
         updateAuthLink();

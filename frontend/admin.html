@@ -815,6 +815,78 @@
     position: relative;
     z-index: 10;
 }
+
+/* ===== REVIEW DETAILS MODAL ===== */
+#reviewDetailsModal .modal {
+    max-width: 500px;
+    padding: 2rem;
+}
+
+#reviewDetailsContent {
+    color: #bbb;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+#reviewDetailsContent .detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+#reviewDetailsContent .detail-label {
+    color: #888;
+    width: 100px;
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+#reviewDetailsContent .detail-value {
+    color: #fff;
+    flex: 1;
+    word-break: break-word;
+}
+
+#reviewDetailsContent .detail-value .stars {
+    color: #d4af37;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+#reviewDetailsContent .detail-value .verified {
+    color: #27ae60;
+    font-size: 0.8rem;
+}
+
+#reviewDetailsContent .detail-value .unverified {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+#reviewDetailsContent .product-name {
+    color: #d4af37;
+    font-weight: 600;
+}
+
+#reviewDetailsContent .user-name {
+    color: #fff;
+    font-weight: 500;
+}
+
+#reviewDetailsContent .user-email {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+#reviewDetailsContent .comment-text {
+    color: #ccc;
+    font-style: italic;
+    padding: 10px 15px;
+    background: #0a0a0a;
+    border-radius: 10px;
+    border-left: 3px solid #d4af37;
+    margin: 5px 0;
+}
     </style>
 </head>
 <body>
@@ -889,6 +961,11 @@
                         <div class="number" id="statRevenue">$0</div>
                     </div>
                 </div>
+                <div class="stat-card">
+    <div class="icon"><i class="fas fa-star"></i></div>
+    <h3>Total Reviews</h3>
+    <div class="number" id="statReviews">0</div>
+</div>
 
                 <div class="table-container">
                     <div class="table-header">
@@ -899,6 +976,8 @@
                         <p>No orders yet</p>
                     </div>
                 </div>
+
+                
             </section>
 
             <!-- ===== PRODUCTS SECTION ===== -->
@@ -1167,6 +1246,30 @@
         </div>
     </div>
 
+<!-- ===== REVIEW DETAILS MODAL ===== -->
+<div class="modal-overlay" id="reviewDetailsModal">
+    <div class="modal" style="max-width: 500px; padding: 2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h2 style="color:#d4af37; font-size:1.4rem; margin:0;">
+                <i class="fas fa-star" style="color:#d4af37;"></i> Review Details
+            </h2>
+            <button onclick="closeModal('reviewDetailsModal')" style="background:none; border:none; color:#888; font-size:1.5rem; cursor:pointer; transition:0.3s;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="reviewDetailsContent" style="color:#bbb; font-size:0.95rem; line-height:1.8;">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+        
+        <div style="display:flex; gap:0.8rem; margin-top:1.5rem; justify-content:flex-end; border-top:1px solid #2a2a2a; padding-top:1.5rem;">
+            <button onclick="closeModal('reviewDetailsModal')" style="background:#2a2a2a; color:#fff; border:none; padding:10px 30px; border-radius:25px; cursor:pointer; font-weight:600; transition:0.3s; font-size:0.9rem;">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
     <script>
     // ============================================================
     // API CONFIGURATION
@@ -1273,6 +1376,7 @@
         if (section === 'products') renderProducts();
         if (section === 'users') renderUsers();
         if (section === 'orders') renderOrders();
+        if (section === 'reviews') loadReviews();
     }
 
     // ============================================================
@@ -2074,7 +2178,7 @@
         renderProducts();
         renderUsers();
         renderOrders();
-
+loadReviews();
         var productSearch = document.getElementById('productSearch');
         if (productSearch) {
             productSearch.addEventListener('keypress', function(e) {
@@ -2097,7 +2201,295 @@
         }
     });
 
+    // ============================================================
+// REVIEWS MANAGEMENT - ADMIN (FULL COMPLETE CODE)
+// ============================================================
+
+// ============================================================
+// LOAD REVIEWS
+// ============================================================
+async function loadReviews() {
+    const tbody = document.getElementById('reviewsTableBody');
+    const countBadge = document.getElementById('reviewCount');
     
+    if (!tbody) return;
+    
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="7" style="text-align:center; padding:2rem; color:#888;">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+                Loading reviews...
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(`${API_URL}/reviews`, {
+            headers: getHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch reviews');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            const reviews = data.reviews || [];
+            displayReviews(reviews);
+            if (countBadge) countBadge.textContent = reviews.length;
+            
+            // Update dashboard stats
+            if (data.stats) {
+                const statReviews = document.getElementById('statReviews');
+                if (statReviews) statReviews.textContent = data.stats.totalReviews || 0;
+            }
+        } else {
+            throw new Error(data.message || 'Failed to load reviews');
+        }
+    } catch (error) {
+        console.error('❌ Error loading reviews:', error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Failed to load reviews: ${error.message}</p>
+                    <button onclick="loadReviews()" style="background:#d4af37; border:none; padding:8px 20px; border-radius:20px; cursor:pointer; margin-top:1rem; color:#0a0a0a; font-weight:600;">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// ============================================================
+// DISPLAY REVIEWS
+// ============================================================
+function displayReviews(reviews) {
+    const tbody = document.getElementById('reviewsTableBody');
+    
+    if (!tbody) return;
+    
+    if (!reviews || reviews.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <i class="fas fa-star"></i>
+                    <p>No reviews yet. Customers haven't reviewed any products.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = '';
+    reviews.forEach((review, index) => {
+        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+        const date = new Date(review.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        const productName = review.product?.name || 'Unknown Product';
+        const userName = review.user?.name || 'Anonymous';
+        const comment = review.comment || '';
+        const truncatedComment = comment.length > 50 ? comment.substring(0, 50) + '...' : comment;
+        
+        let statusClass = 'pending';
+        let statusText = '⭐ Good';
+        if (review.rating >= 4) {
+            statusClass = 'active';
+            statusText = '⭐ Excellent';
+        } else if (review.rating >= 3) {
+            statusClass = 'pending';
+            statusText = '⭐ Okay';
+        } else {
+            statusClass = 'inactive';
+            statusText = '⭐ Poor';
+        }
+        
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td style="color:#d4af37; font-weight:500;">${productName}</td>
+                <td>${userName}</td>
+                <td>
+                    <div style="color:#d4af37; font-size:1.1rem; letter-spacing:1px;">${stars}</div>
+                    <span class="status-badge ${statusClass}" style="font-size:0.6rem;">${statusText}</span>
+                </td>
+                <td>
+                    <div class="review-comment" title="${comment}">${truncatedComment}</div>
+                    ${review.verifiedPurchase ? '<span style="color:#27ae60; font-size:0.6rem; display:block;">✓ Verified Purchase</span>' : ''}
+                </td>
+                <td style="color:#888; font-size:0.8rem;">${date}</td>
+                <td>
+                    <button class="action-btn" onclick="viewReview('${review._id}')" title="View Review">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteReview('${review._id}')" title="Delete Review">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// VIEW REVIEW DETAIL - MODAL VERSION
+// ============================================================
+async function viewReview(reviewId) {
+    try {
+        console.log(`📡 Fetching review: ${reviewId}`);
+        
+        const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+            headers: getHeaders()
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                showNotification('Review not found! It may have been deleted.', 'error');
+                loadReviews();
+                return;
+            }
+            throw new Error(`HTTP ${response.status}: Failed to fetch review details`);
+        }
+
+        const data = await response.json();
+        console.log('📦 Review data:', data);
+        
+        if (data.success && data.review) {
+            const review = data.review;
+            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+            const date = new Date(review.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const productName = review.product?.name || 'Unknown Product';
+            const userName = review.user?.name || 'Anonymous';
+            const userEmail = review.user?.email || '';
+            const verifiedBadge = review.verifiedPurchase 
+                ? '<span class="verified"><i class="fas fa-check-circle"></i> Verified Purchase</span>' 
+                : '<span class="unverified"><i class="fas fa-circle" style="font-size:0.5rem; vertical-align:middle;"></i> Unverified</span>';
+            
+            // Build the modal content
+            const content = document.getElementById('reviewDetailsContent');
+            content.innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">📦 Product</span>
+                    <span class="detail-value product-name">${productName}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">👤 Customer</span>
+                    <span class="detail-value">
+                        <span class="user-name">${userName}</span>
+                        ${userEmail ? `<br><span class="user-email">${userEmail}</span>` : ''}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">⭐ Rating</span>
+                    <span class="detail-value">
+                        <span class="stars">${stars}</span>
+                        <br><span style="color:#888; font-size:0.85rem;">${review.rating}/5</span>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">✅ Status</span>
+                    <span class="detail-value">${verifiedBadge}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📅 Date</span>
+                    <span class="detail-value" style="color:#888;">${date}</span>
+                </div>
+                ${review.title ? `
+                <div class="detail-row">
+                    <span class="detail-label">📝 Title</span>
+                    <span class="detail-value" style="color:#d4af37; font-weight:500;">${review.title}</span>
+                </div>
+                ` : ''}
+                <div class="detail-row" style="align-items:flex-start;">
+                    <span class="detail-label">💬 Comment</span>
+                    <span class="detail-value comment-text">${review.comment || 'No comment'}</span>
+                </div>
+                <div class="detail-row" style="border-bottom:none; padding-bottom:0;">
+                    <span class="detail-label">❤️ Helpful</span>
+                    <span class="detail-value" style="color:#888;">${review.helpfulCount || 0} people found this helpful</span>
+                </div>
+            `;
+            
+            // Show the modal
+            document.getElementById('reviewDetailsModal').classList.add('show');
+            
+        } else {
+            showNotification('Failed to load review details', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error viewing review:', error);
+        showNotification('Failed to load review details: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// DELETE REVIEW (ADMIN)
+// ============================================================
+async function deleteReview(reviewId) {
+    if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Review deleted successfully!', 'success');
+            loadReviews();
+        } else {
+            throw new Error(data.message || 'Failed to delete review');
+        }
+    } catch (error) {
+        console.error('❌ Error deleting review:', error);
+        showNotification('Failed to delete review: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// SEARCH REVIEWS
+// ============================================================
+function searchReviews() {
+    loadReviews();
+}
+
+// ============================================================
+// GET REVIEW STATS (for dashboard)
+// ============================================================
+async function getReviewStats() {
+    try {
+        const response = await fetch(`${API_URL}/reviews/stats`, {
+            headers: getHeaders()
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.stats) {
+                const statReviews = document.getElementById('statReviews');
+                if (statReviews) {
+                    statReviews.textContent = data.stats.totalReviews || 0;
+                }
+                console.log(`📊 Reviews Stats - Total: ${data.stats.totalReviews}, Avg Rating: ${data.stats.averageRating}`);
+            }
+        }
+    } catch (error) {
+        console.log('Could not fetch review stats:', error);
+    }
+}
     </script>
 </body>
 </html>

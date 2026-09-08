@@ -527,3 +527,94 @@ exports.markHelpful = async (req, res) => {
         });
     }
 };
+
+// ============================================================
+// GET ALL REVIEWS (ADMIN)
+// ============================================================
+exports.getAllReviews = async (req, res) => {
+    try {
+        const { page = 1, limit = 20, search } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        let filter = {};
+        if (search) {
+            filter = {
+                $or: [
+                    { comment: { $regex: search, $options: 'i' } },
+                    { title: { $regex: search, $options: 'i' } }
+                ]
+            };
+        }
+
+        const reviews = await Review.find(filter)
+            .populate('user', 'name email')
+            .populate('product', 'name price image')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const total = await Review.countDocuments(filter);
+
+        // Calculate stats
+        const stats = await Review.aggregate([
+            { $match: filter },
+            { $group: {
+                _id: null,
+                averageRating: { $avg: '$rating' },
+                totalReviews: { $sum: 1 }
+            }}
+        ]);
+
+        res.json({
+            success: true,
+            count: reviews.length,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / parseInt(limit)),
+            reviews,
+            stats: stats.length > 0 ? {
+                averageRating: Math.round(stats[0].averageRating * 10) / 10,
+                totalReviews: stats[0].totalReviews
+            } : {
+                averageRating: 0,
+                totalReviews: 0
+            }
+        });
+    } catch (error) {
+        console.error('❌ Get all reviews error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to get reviews'
+        });
+    }
+};
+// ============================================================
+// GET REVIEW BY ID (ADMIN)
+// ============================================================
+exports.getReviewById = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+
+        const review = await Review.findById(reviewId)
+            .populate('user', 'name email phone')
+            .populate('product', 'name price image category');
+
+        if (!review) {
+            return res.status(404).json({
+                success: false,
+                message: 'Review not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            review
+        });
+    } catch (error) {
+        console.error('❌ Get review by ID error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to get review'
+        });
+    }
+};
